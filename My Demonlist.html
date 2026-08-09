@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Hardests List</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: #121318;
+            color: #e0e0e0;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+            flex-direction: column; /* Gut für Smartphones */
+        }
+
+        @media (min-width: 600px) {
+            .app-container {
+                flex-direction: row; /* Für Tablet / PC */
+            }
+        }
+
+        /* Sidebar / Liste */
+        .sidebar {
+            width: 100%;
+            background-color: #1a1b23;
+            border-bottom: 1px solid #2a2c3a;
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            max-height: 40vh; /* Auf dem Handy nimmt die Liste oben max 40% Platz ein */
+        }
+
+        @media (min-width: 600px) {
+            .sidebar {
+                width: 320px;
+                max-height: 100vh;
+                border-right: 1px solid #2a2c3a;
+                border-bottom: none;
+            }
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .logo-highlight {
+            color: #ff6b00;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 10px;
+        }
+
+        .tab {
+            background: none;
+            border: none;
+            color: #ff6b00;
+            border-bottom: 2px solid #ff6b00;
+            padding: 5px 10px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #search {
+            width: 100%;
+            padding: 8px 12px;
+            background-color: #121318;
+            border: 1px solid #2a2c3a;
+            border-radius: 6px;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .level-list {
+            list-style: none;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        .level-item {
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            background-color: #21232e;
+            display: flex;
+            gap: 10px;
+        }
+
+        .level-item.active {
+            background-color: #ff6b00;
+            color: white;
+        }
+
+        .rank {
+            font-weight: bold;
+        }
+
+        /* Contentbereich */
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .level-title {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .description {
+            color: #aaa;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 Format */
+            height: 0;
+            width: 100%;
+            max-width: 700px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .info-card {
+            background-color: #1a1b23;
+            padding: 15px;
+            border-radius: 8px;
+            max-width: 700px;
+            border: 1px solid #2a2c3a;
+        }
+
+        .info-row {
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #2a2c3a;
+            padding-bottom: 6px;
+            font-size: 14px;
+        }
+
+        .info-label {
+            color: #888;
+            font-weight: bold;
+        }
+
+        .info-value {
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .difficulty-icon {
+            height: 24px;
+            width: auto;
+        }
+
+        .my-name {
+            color: #ff6b00;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Navigation / Liste -->
+        <aside class="sidebar">
+            <div class="logo">
+                <span class="logo-highlight">MY</span> HARDISTS
+            </div>
+            <div class="tabs">
+                <button class="tab">CLASSIC</button>
+            </div>
+            <input type="text" id="search" placeholder="Search..." onkeyup="filterLevels()">
+            <ul id="level-list" class="level-list"></ul>
+        </aside>
+
+        <!-- Main Details -->
+        <main class="content">
+            <div id="level-details"></div>
+        </main>
+    </div>
+
+    <script>
+        
+        const demons = [
+            {
+                rank: 1,
+                name: "Cataclysm",
+                difficulty: "Extreme Demon",
+               difficultyIcon: "extreme.jpg",
+                publisher: "Ggb0y",
+                creator: "Ggb0y",
+                myVerifier: "Derlery5",        
+                originalVerifier: "Riot",    
+                victors: ["Player1", "Player2", "Player3"],
+                youtubeId: "ywRSUFdOxqI",   
+                description: "~6200 Attempts."
+            },
+            {
+                rank: 2,
+                name: "Been so long",
+                difficulty: "Insane Demon",
+                difficultyIcon: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Demon_difficulty_Insane.png/120px-Demon_difficulty_Insane.png",
+                publisher: "BroodingAcorn",
+                creator: "BroodingAcorn",
+                myVerifier: "Chrishuen",
+                originalVerifier: "BroodingAcorn",
+                victors: ["Player 1", "Player 2"],
+                youtubeId: "r7QaaUqlXyE",
+                description: "Tuffes FNAF Level."
+            },
+            {
+                rank: 3,
+                name: "Been so long",
+                difficulty: "Hard Demon",
+                difficultyIcon: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Demon_difficulty_Hard.png/120px-Demon_difficulty_Hard.png",
+                publisher: "BroodingAcorn",
+                creator: "BroodingAcorn",
+                myVerifier: "Chrishuen",
+                originalVerifier: "BroodingAcorn",
+                victors: ["Player 1", "Player 2"],
+                youtubeId: "r7QaaUqlXyE",
+                description: "Tuffes FNAF Level."
+            }
+        ];
+
+        function loadLevelList() {
+            const listElement = document.getElementById("level-list");
+            listElement.innerHTML = "";
+
+            demons.forEach((demon, index) => {
+                const li = document.createElement("li");
+                li.className = `level-item ${index === 0 ? 'active' : ''}`;
+                li.onclick = () => selectLevel(index);
+                li.innerHTML = `<span class="rank">#${demon.rank}</span> <span class="name">${demon.name}</span>`;
+                listElement.appendChild(li);
+            });
+
+            if (demons.length > 0) {
+                selectLevel(0);
+            }
+        }
+
+        function selectLevel(index) {
+            const items = document.querySelectorAll(".level-item");
+            items.forEach((item, i) => {
+                item.classList.toggle("active", i === index);
+            });
+
+            const demon = demons[index];
+            const detailsContainer = document.getElementById("level-details");
+
+            detailsContainer.innerHTML = `
+                <h1 class="level-title">#${demon.rank} - ${demon.name}</h1>
+                <p class="description">${demon.description}</p>
+                
+                <div class="video-container">
+                    <iframe src="https://www.youtube-nocookie.com/embed/${demon.youtubeId}" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-row">
+                        <span class="info-label">Difficulty:</span>
+                        <span class="info-value">
+                            <img src="${demon.difficultyIcon}" alt="${demon.difficulty}" class="difficulty-icon">
+                            ${demon.difficulty}
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Publisher:</span>
+                        <span class="info-value">${demon.publisher}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Creator:</span>
+                        <span class="info-value">${demon.creator}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Verifier:</span>
+                        <span class="info-value my-name">${demon.myVerifier}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Original Verifier:</span>
+                        <span class="info-value">${demon.originalVerifier}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Other Victors:</span>
+                        <span class="info-value">${demon.victors.join(", ")}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function filterLevels() {
+            const query = document.getElementById("search").value.toLowerCase();
+            const items = document.querySelectorAll(".level-item");
+
+            items.forEach((item, index) => {
+                const text = demons[index].name.toLowerCase();
+                item.style.display = text.includes(query) ? "flex" : "none";
+            });
+        }
+
+        window.onload = loadLevelList;
+    </script>
+</body>
+</html>
