@@ -118,6 +118,50 @@
             font-weight: bold;
         }
 
+        /* Main Layout Header & Content */
+        .main-wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .top-header {
+            background-color: #1a1b23;
+            border-bottom: 1px solid #2a2c3a;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .account-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background-color: #21232e;
+            border: 1px solid #2a2c3a;
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            color: #fff;
+            font-weight: bold;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+
+        .account-btn:hover {
+            background-color: #2a2c3a;
+        }
+
+        .avatar-img {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            object-fit: cover;
+            background-color: #121318;
+        }
+
         /* Contentbereich */
         .content {
             flex-grow: 1;
@@ -192,6 +236,108 @@
             color: #ff6b00;
             font-weight: bold;
         }
+
+        /* Modal / Dialog Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: #1a1b23;
+            border: 1px solid #2a2c3a;
+            border-radius: 8px;
+            padding: 25px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-title {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 4px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            background-color: #121318;
+            border: 1px solid #2a2c3a;
+            border-radius: 6px;
+            color: #fff;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            color: #aaa;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 10px;
+            background-color: #ff6b00;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        .btn-secondary {
+            width: 100%;
+            padding: 8px;
+            background-color: transparent;
+            border: 1px solid #2a2c3a;
+            border-radius: 6px;
+            color: #888;
+            cursor: pointer;
+        }
+
+        .error-message {
+            color: #ff4d4d;
+            font-size: 12px;
+            margin-bottom: 10px;
+            display: none;
+        }
+
+        .profile-avatar-large {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 15px auto;
+            display: block;
+            border: 2px solid #ff6b00;
+        }
     </style>
 </head>
 <body>
@@ -210,14 +356,213 @@
             <ul id="level-list" class="level-list"></ul>
         </aside>
 
-        <!-- Main Details -->
-        <main class="content">
-            <div id="level-details"></div>
-        </main>
+        <!-- Main Wrapper mit Header oben -->
+        <div class="main-wrapper">
+            <header class="top-header">
+                <button class="account-btn" onclick="handleAccountClick()">
+                    <img src="https://via.placeholder.com/150/21232e/888888?text=User" id="header-avatar" class="avatar-img" alt="Avatar">
+                    <span id="header-username">Log In / Register</span>
+                </button>
+            </header>
+
+            <!-- Main Details -->
+            <main class="content">
+                <div id="level-details"></div>
+            </main>
+        </div>
     </div>
 
-    <script>
-        let currentTab = "classic"; // 'classic' oder 'players'
+    <!-- Login / Register Modal -->
+    <div class="modal" id="auth-modal">
+        <div class="modal-content">
+            <h2 class="modal-title" id="auth-title">Log In</h2>
+            <div class="error-message" id="auth-error"></div>
+            
+            <form id="auth-form" onsubmit="handleAuthSubmit(event)">
+                <div class="form-group" id="username-group" style="display: none;">
+                    <label for="auth-username">Ingame Username</label>
+                    <input type="text" id="auth-username" placeholder="e.g. Derlery5">
+                </div>
+                <div class="form-group">
+                    <label for="auth-email">Email</label>
+                    <input type="email" id="auth-email" required placeholder="name@example.com">
+                </div>
+                <div class="form-group">
+                    <label for="auth-password">Password</label>
+                    <input type="password" id="auth-password" required placeholder="••••••••">
+                </div>
+                <div class="checkbox-group" id="remember-group">
+                    <input type="checkbox" id="auth-remember" checked>
+                    <label for="auth-remember">Angemeldet bleiben</label>
+                </div>
+
+                <button type="submit" class="btn-primary" id="auth-submit-btn">Log In</button>
+                <button type="button" class="btn-secondary" onclick="toggleAuthMode()" id="auth-toggle-btn">Need an account? Register</button>
+                <button type="button" class="btn-secondary" onclick="closeAuthModal()" style="margin-top: 5px;">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { 
+            getAuth, 
+            createUserWithEmailAndPassword, 
+            signInWithEmailAndPassword, 
+            signOut, 
+            onAuthStateChanged,
+            setPersistence,
+            browserLocalPersistence,
+            browserSessionPersistence
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            setDoc, 
+            getDoc,
+            updateDoc
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Deine Firebase-Konfiguration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDaHc7pgi4RaKSYrL3X_BotZ8VB15XBK1Y",
+            authDomain: "german-demonlist.firebaseapp.com",
+            projectId: "german-demonlist",
+            storageBucket: "german-demonlist.firebasestorage.app",
+            messagingSenderId: "502395064717",
+            appId: "1:502395064717:web:4c5919fed8ec30p48c5pc4",
+            measurementId: "G-78M8FVNYQX"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Standard Profilbild URL (Klassisches Standard-Bild)
+        const DEFAULT_AVATAR = "https://via.placeholder.com/150/21232e/888888?text=User";
+
+        let currentUserData = null;
+        let isRegisterMode = false;
+
+        // Auth Status-Änderung überwachen
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // Daten aus Firestore laden
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                if (userDoc.exists()) {
+                    currentUserData = userDoc.data();
+                } else {
+                    currentUserData = {
+                        username: user.email.split("@")[0],
+                        avatarUrl: DEFAULT_AVATAR
+                    };
+                }
+                updateHeaderUI(true);
+            } else {
+                currentUserData = null;
+                updateHeaderUI(false);
+            }
+        });
+
+        function updateHeaderUI(isLoggedIn) {
+            const avatar = document.getElementById("header-avatar");
+            const name = document.getElementById("header-username");
+
+            if (isLoggedIn && currentUserData) {
+                avatar.src = currentUserData.avatarUrl || DEFAULT_AVATAR;
+                name.textContent = currentUserData.username || "Profile";
+            } else {
+                avatar.src = DEFAULT_AVATAR;
+                name.textContent = "Log In / Register";
+            }
+        }
+
+        window.handleAccountClick = function() {
+            if (auth.currentUser) {
+                switchTab('profile');
+            } else {
+                openAuthModal();
+            }
+        };
+
+        function openAuthModal() {
+            document.getElementById("auth-modal").classList.add("active");
+            document.getElementById("auth-error").style.display = "none";
+        }
+
+        window.closeAuthModal = function() {
+            document.getElementById("auth-modal").classList.remove("active");
+        };
+
+        window.toggleAuthMode = function() {
+            isRegisterMode = !isRegisterMode;
+            document.getElementById("auth-title").textContent = isRegisterMode ? "Register" : "Log In";
+            document.getElementById("username-group").style.display = isRegisterMode ? "block" : "none";
+            document.getElementById("auth-submit-btn").textContent = isRegisterMode ? "Register" : "Log In";
+            document.getElementById("auth-toggle-btn").textContent = isRegisterMode ? "Already have an account? Log In" : "Need an account? Register";
+            document.getElementById("auth-error").style.display = "none";
+        };
+
+        window.handleAuthSubmit = async function(e) {
+            e.preventDefault();
+            const email = document.getElementById("auth-email").value;
+            const password = document.getElementById("auth-password").value;
+            const remember = document.getElementById("auth-remember").checked;
+            const errorElement = document.getElementById("auth-error");
+
+            errorElement.style.display = "none";
+
+            try {
+                // Angemeldet bleiben Status setzen
+                const persistence = remember ? browserLocalPersistence : browserSessionPersistence;
+                await setPersistence(auth, persistence);
+
+                if (isRegisterMode) {
+                    const username = document.getElementById("auth-username").value.trim() || email.split("@")[0];
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    const user = userCredential.user;
+
+                    // Firestore Profil anlegen
+                    await setDoc(doc(db, "users", user.uid), {
+                        username: username,
+                        avatarUrl: DEFAULT_AVATAR,
+                        createdAt: new Date().toISOString()
+                    });
+                } else {
+                    await signInWithEmailAndPassword(auth, email, password);
+                }
+
+                closeAuthModal();
+            } catch (error) {
+                errorElement.textContent = error.message;
+                errorElement.style.display = "block";
+            }
+        };
+
+        window.handleLogout = async function() {
+            await signOut(auth);
+            switchTab('classic');
+        };
+
+        window.updateAvatarUrl = async function() {
+            const newUrl = prompt("Gib den Bild-Link (URL) für dein neues Profilbild ein:", currentUserData?.avatarUrl || "");
+            if (newUrl && auth.currentUser) {
+                try {
+                    await updateDoc(doc(db, "users", auth.currentUser.uid), {
+                        avatarUrl: newUrl
+                    });
+                    currentUserData.avatarUrl = newUrl;
+                    updateHeaderUI(true);
+                    selectLevel(0); // Profil neu laden
+                } catch (e) {
+                    alert("Fehler beim Speichern des Profilbilds: " + e.message);
+                }
+            }
+        };
+
+        // Tab System Logik
+        window.currentTab = "classic";
 
         const demons = [
             {
@@ -376,26 +721,31 @@
             }
         ];
 
-        function switchTab(tab) {
-            currentTab = tab;
+        window.switchTab = function(tab) {
+            window.currentTab = tab;
             document.getElementById("tab-classic").classList.toggle("active", tab === "classic");
             document.getElementById("tab-players").classList.toggle("active", tab === "players");
             document.getElementById("search").value = "";
             loadLevelList();
-        }
+        };
 
         function loadLevelList() {
             const listElement = document.getElementById("level-list");
             listElement.innerHTML = "";
 
-            const data = currentTab === "classic" ? demons : players;
+            if (window.currentTab === "profile") {
+                selectLevel(0);
+                return;
+            }
+
+            const data = window.currentTab === "classic" ? demons : players;
 
             data.forEach((item, index) => {
                 const li = document.createElement("li");
                 li.className = `level-item ${index === 0 ? 'active' : ''}`;
                 li.onclick = () => selectLevel(index);
 
-                const num = currentTab === "classic" ? item.rank : item.placement;
+                const num = window.currentTab === "classic" ? item.rank : item.placement;
                 li.innerHTML = `<span class="rank">#${num}</span> <span class="name">${item.name}</span>`;
                 listElement.appendChild(li);
             });
@@ -413,7 +763,48 @@
 
             const detailsContainer = document.getElementById("level-details");
 
-            if (currentTab === "classic") {
+            if (window.currentTab === "profile") {
+                const username = currentUserData?.username || "Player";
+                const matchingPlayer = players.find(p => p.name.toLowerCase() === username.toLowerCase()) || {
+                    placement: "-",
+                    points: 0,
+                    currentHardest: "-",
+                    beatenExtremes: []
+                };
+
+                detailsContainer.innerHTML = `
+                    <img src="${currentUserData?.avatarUrl || DEFAULT_AVATAR}" class="profile-avatar-large" alt="Avatar">
+                    <h1 class="level-title" style="text-align: center;">${username}</h1>
+                    <p class="description" style="text-align: center;">My Profile</p>
+
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <button class="btn-primary" style="width: auto; padding: 6px 15px; font-size: 13px;" onclick="updateAvatarUrl()">Change Profile Picture</button>
+                    </div>
+
+                    <div class="info-card" style="margin: 0 auto;">
+                        <div class="info-row">
+                            <span class="info-label">Placement:</span>
+                            <span class="info-value">#${matchingPlayer.placement}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Points:</span>
+                            <span class="info-value">${matchingPlayer.points}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Current Hardest:</span>
+                            <span class="info-value my-name">${matchingPlayer.currentHardest}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Beaten Extremes:</span>
+                            <span class="info-value">${matchingPlayer.beatenExtremes.length > 0 ? matchingPlayer.beatenExtremes.join(", ") : "None"}</span>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 25px;">
+                        <button class="btn-secondary" style="width: auto; padding: 8px 20px; color: #ff4d4d; border-color: #ff4d4d;" onclick="handleLogout()">Log Out</button>
+                    </div>
+                `;
+            } else if (window.currentTab === "classic") {
                 const demon = demons[index];
                 detailsContainer.innerHTML = `
                     <h1 class="level-title">#${demon.rank} - ${demon.name}</h1>
@@ -481,16 +872,18 @@
             }
         }
 
-        function filterLevels() {
+        window.filterLevels = function() {
             const query = document.getElementById("search").value.toLowerCase();
             const items = document.querySelectorAll(".level-item");
-            const data = currentTab === "classic" ? demons : players;
+            const data = window.currentTab === "classic" ? demons : players;
 
             items.forEach((item, index) => {
-                const text = data[index].name.toLowerCase();
-                item.style.display = text.includes(query) ? "flex" : "none";
+                if (data[index]) {
+                    const text = data[index].name.toLowerCase();
+                    item.style.display = text.includes(query) ? "flex" : "none";
+                }
             });
-        }
+        };
 
         window.onload = loadLevelList;
     </script>
