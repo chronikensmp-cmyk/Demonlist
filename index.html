@@ -64,17 +64,23 @@
 
         .tabs {
             display: flex;
+            gap: 10px;
             margin-bottom: 10px;
         }
 
         .tab {
             background: none;
             border: none;
-            color: #ff6b00;
-            border-bottom: 2px solid #ff6b00;
+            color: #888;
+            border-bottom: 2px solid transparent;
             padding: 5px 10px;
             font-weight: bold;
             cursor: pointer;
+        }
+
+        .tab.active {
+            color: #ff6b00;
+            border-bottom: 2px solid #ff6b00;
         }
 
         #search {
@@ -197,7 +203,8 @@
                 <span class="logo-highlight">German</span> Demonlist
             </div>
             <div class="tabs">
-                <button class="tab">CLASSIC</button>
+                <button class="tab active" id="tab-classic" onclick="switchTab('classic')">CLASSIC</button>
+                <button class="tab" id="tab-players" onclick="switchTab('players')">PLAYERS</button>
             </div>
             <input type="text" id="search" placeholder="Search..." onkeyup="filterLevels()">
             <ul id="level-list" class="level-list"></ul>
@@ -210,7 +217,8 @@
     </div>
 
     <script>
-        
+        let currentTab = "classic"; // 'classic' oder 'players'
+
         const demons = [
             {
                 rank: 1,
@@ -344,19 +352,55 @@
             },
         ];
 
+        const players = [
+            {
+                placement: 1,
+                name: "Derlery5",
+                currentHardest: "Cataclysm",
+                points: 71,
+                beatenExtremes: ["Cataclysm", "ACU"]
+            },
+            {
+                placement: 2,
+                name: "lLimbu",
+                currentHardest: "Sweather Weather",
+                points: 30,
+                beatenExtremes: ["Sweather Weather", "ACU"]
+            },
+            {
+                placement: 3,
+                name: "qChrc",
+                currentHardest: "Blackfire Backfire",
+                points: 0,
+                beatenExtremes: []
+            }
+        ];
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.getElementById("tab-classic").classList.toggle("active", tab === "classic");
+            document.getElementById("tab-players").classList.toggle("active", tab === "players");
+            document.getElementById("search").value = "";
+            loadLevelList();
+        }
+
         function loadLevelList() {
             const listElement = document.getElementById("level-list");
             listElement.innerHTML = "";
 
-            demons.forEach((demon, index) => {
+            const data = currentTab === "classic" ? demons : players;
+
+            data.forEach((item, index) => {
                 const li = document.createElement("li");
                 li.className = `level-item ${index === 0 ? 'active' : ''}`;
                 li.onclick = () => selectLevel(index);
-                li.innerHTML = `<span class="rank">#${demon.rank}</span> <span class="name">${demon.name}</span>`;
+
+                const num = currentTab === "classic" ? item.rank : item.placement;
+                li.innerHTML = `<span class="rank">#${num}</span> <span class="name">${item.name}</span>`;
                 listElement.appendChild(li);
             });
 
-            if (demons.length > 0) {
+            if (data.length > 0) {
                 selectLevel(0);
             }
         }
@@ -367,55 +411,83 @@
                 item.classList.toggle("active", i === index);
             });
 
-            const demon = demons[index];
             const detailsContainer = document.getElementById("level-details");
 
-            detailsContainer.innerHTML = `
-                <h1 class="level-title">#${demon.rank} - ${demon.name}</h1>
-                <p class="description">${demon.description}</p>
-                
-                <div class="video-container">
-                    <iframe src="https://www.youtube-nocookie.com/embed/${demon.youtubeId}" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-                </div>
+            if (currentTab === "classic") {
+                const demon = demons[index];
+                detailsContainer.innerHTML = `
+                    <h1 class="level-title">#${demon.rank} - ${demon.name}</h1>
+                    <p class="description">${demon.description}</p>
+                    
+                    <div class="video-container">
+                        <iframe src="https://www.youtube-nocookie.com/embed/${demon.youtubeId}" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                    </div>
 
-                <div class="info-card">
-                    <div class="info-row">
-                        <span class="info-label">Difficulty:</span>
-                        <span class="info-value">
-                            <img src="${demon.difficultyIcon}" alt="${demon.difficulty}" class="difficulty-icon">
-                            ${demon.difficulty}
-                        </span>
+                    <div class="info-card">
+                        <div class="info-row">
+                            <span class="info-label">Difficulty:</span>
+                            <span class="info-value">
+                                <img src="${demon.difficultyIcon}" alt="${demon.difficulty}" class="difficulty-icon">
+                                ${demon.difficulty}
+                            </span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Publisher:</span>
+                            <span class="info-value">${demon.publisher}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Creator:</span>
+                            <span class="info-value">${demon.creator}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Verifier:</span>
+                            <span class="info-value my-name">${demon.myVerifier}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Original Verifier:</span>
+                            <span class="info-value">${demon.originalVerifier}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Other Victors:</span>
+                            <span class="info-value">${demon.victors.join(", ")}</span>
+                        </div>
                     </div>
-                    <div class="info-row">
-                        <span class="info-label">Publisher:</span>
-                        <span class="info-value">${demon.publisher}</span>
+                `;
+            } else {
+                const player = players[index];
+                detailsContainer.innerHTML = `
+                    <h1 class="level-title">#${player.placement} - ${player.name}</h1>
+                    <p class="description">Player Profile</p>
+
+                    <div class="info-card">
+                        <div class="info-row">
+                            <span class="info-label">Placement:</span>
+                            <span class="info-value">#${player.placement}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Points:</span>
+                            <span class="info-value">${player.points}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Current Hardest:</span>
+                            <span class="info-value my-name">${player.currentHardest}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Beaten Extremes:</span>
+                            <span class="info-value">${player.beatenExtremes.length > 0 ? player.beatenExtremes.join(", ") : "None"}</span>
+                        </div>
                     </div>
-                    <div class="info-row">
-                        <span class="info-label">Creator:</span>
-                        <span class="info-value">${demon.creator}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Verifier:</span>
-                        <span class="info-value my-name">${demon.myVerifier}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Original Verifier:</span>
-                        <span class="info-value">${demon.originalVerifier}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Other Victors:</span>
-                        <span class="info-value">${demon.victors.join(", ")}</span>
-                    </div>
-                </div>
-            `;
+                `;
+            }
         }
 
         function filterLevels() {
             const query = document.getElementById("search").value.toLowerCase();
             const items = document.querySelectorAll(".level-item");
+            const data = currentTab === "classic" ? demons : players;
 
             items.forEach((item, index) => {
-                const text = demons[index].name.toLowerCase();
+                const text = data[index].name.toLowerCase();
                 item.style.display = text.includes(query) ? "flex" : "none";
             });
         }
