@@ -56,6 +56,7 @@
             font-weight: bold;
             color: #fff;
             margin-bottom: 10px;
+            cursor: pointer;
         }
 
         .logo-highlight {
@@ -159,7 +160,7 @@
             height: 28px;
             border-radius: 50%;
             object-fit: cover;
-            background-color: #121318;
+            background-color: #2a2c3a;
         }
 
         /* Contentbereich */
@@ -337,6 +338,7 @@
             margin: 0 auto 15px auto;
             display: block;
             border: 2px solid #ff6b00;
+            background-color: #2a2c3a;
         }
     </style>
 </head>
@@ -345,7 +347,7 @@
     <div class="app-container">
         <!-- Navigation / Liste -->
         <aside class="sidebar">
-            <div class="logo">
+            <div class="logo" onclick="switchTab('classic')">
                 <span class="logo-highlight">German</span> Demonlist
             </div>
             <div class="tabs">
@@ -360,7 +362,7 @@
         <div class="main-wrapper">
             <header class="top-header">
                 <button class="account-btn" onclick="handleAccountClick()">
-                    <img src="https://via.placeholder.com/150/21232e/888888?text=User" id="header-avatar" class="avatar-img" alt="Avatar">
+                    <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23888888'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/></svg>" id="header-avatar" class="avatar-img" alt="Avatar">
                     <span id="header-username">Log In / Register</span>
                 </button>
             </header>
@@ -426,7 +428,7 @@
 
         // Deine Firebase-Konfiguration
         const firebaseConfig = {
-            apiKey: "AIzaSyBaHc7pgi4RaKSYrL3X_BotZ8VB15XBKIY",
+            apiKey: "AIzaSyDaHc7pgi4RaKSYrL3X_BotZ8VB15XBK1Y",
             authDomain: "german-demonlist.firebaseapp.com",
             projectId: "german-demonlist",
             storageBucket: "german-demonlist.firebasestorage.app",
@@ -439,8 +441,8 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Standard Profilbild URL (Klassisches Standard-Bild)
-        const DEFAULT_AVATAR = "https://via.placeholder.com/150/21232e/888888?text=User";
+        // Standard Profilbild URL (Gültiges SVG-Standard-Icon)
+        const DEFAULT_AVATAR = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23888888'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/></svg>";
 
         let currentUserData = null;
         let isRegisterMode = false;
@@ -773,6 +775,10 @@
                 };
 
                 detailsContainer.innerHTML = `
+                    <div style="margin-bottom: 15px;">
+                        <button class="btn-secondary" style="width: auto; padding: 6px 12px; font-size: 13px;" onclick="switchTab('classic')">← Back to List</button>
+                    </div>
+
                     <img src="${currentUserData?.avatarUrl || DEFAULT_AVATAR}" class="profile-avatar-large" alt="Avatar">
                     <h1 class="level-title" style="text-align: center;">${username}</h1>
                     <p class="description" style="text-align: center;">My Profile</p>
