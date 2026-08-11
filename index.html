@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Demonlist</title>
+    <title>German Demonlist</title>
     <style>
         * {
             box-sizing: border-box;
@@ -22,12 +22,12 @@
         .app-container {
             display: flex;
             height: 100vh;
-            flex-direction: column; /* Gut für Smartphones */
+            flex-direction: column;
         }
 
         @media (min-width: 600px) {
             .app-container {
-                flex-direction: row; /* Für Tablet / PC */
+                flex-direction: row;
             }
         }
 
@@ -39,7 +39,7 @@
             display: flex;
             flex-direction: column;
             padding: 15px;
-            max-height: 40vh; /* Auf dem Handy nimmt die Liste oben max 40% Platz ein */
+            max-height: 40vh;
         }
 
         @media (min-width: 600px) {
@@ -233,12 +233,12 @@
             width: auto;
         }
 
-        .my-name {
+        .highlight-name {
             color: #ff6b00;
             font-weight: bold;
         }
 
-        /* Modal / Dialog Styles */
+        /* Modal Styles */
         .modal {
             display: none;
             position: fixed;
@@ -345,7 +345,7 @@
 <body>
 
     <div class="app-container">
-        <!-- Navigation / Liste -->
+        <!-- Sidebar -->
         <aside class="sidebar">
             <div class="logo" onclick="switchTab('classic')">
                 <span class="logo-highlight">German</span> Demonlist
@@ -358,7 +358,7 @@
             <ul id="level-list" class="level-list"></ul>
         </aside>
 
-        <!-- Main Wrapper mit Header oben -->
+        <!-- Main Wrapper -->
         <div class="main-wrapper">
             <header class="top-header">
                 <button class="account-btn" onclick="handleAccountClick()">
@@ -367,14 +367,13 @@
                 </button>
             </header>
 
-            <!-- Main Details -->
             <main class="content">
                 <div id="level-details"></div>
             </main>
         </div>
     </div>
 
-    <!-- Login / Register Modal -->
+    <!-- Modal -->
     <div class="modal" id="auth-modal">
         <div class="modal-content">
             <h2 class="modal-title" id="auth-title">Log In</h2>
@@ -405,7 +404,7 @@
         </div>
     </div>
 
-    <!-- Firebase SDKs -->
+    <!-- Firebase Script -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { 
@@ -426,7 +425,6 @@
             updateDoc
         } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // Deine Firebase-Konfiguration
         const firebaseConfig = {
             apiKey: "AIzaSyBaHc7pgi4RaKSYrL3X_BotZ8VB15XBKIY",
             authDomain: "german-demonlist.firebaseapp.com",
@@ -441,16 +439,13 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Standard Profilbild URL (Gültiges SVG-Standard-Icon)
         const DEFAULT_AVATAR = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23888888'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/></svg>";
 
         let currentUserData = null;
         let isRegisterMode = false;
 
-        // Auth Status-Änderung überwachen
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                // Daten aus Firestore laden
                 const userDoc = await getDoc(doc(db, "users", user.uid));
                 if (userDoc.exists()) {
                     currentUserData = userDoc.data();
@@ -516,7 +511,6 @@
             errorElement.style.display = "none";
 
             try {
-                // Angemeldet bleiben Status setzen
                 const persistence = remember ? browserLocalPersistence : browserSessionPersistence;
                 await setPersistence(auth, persistence);
 
@@ -525,7 +519,6 @@
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                     const user = userCredential.user;
 
-                    // Firestore Profil anlegen
                     await setDoc(doc(db, "users", user.uid), {
                         username: username,
                         avatarUrl: DEFAULT_AVATAR,
@@ -556,14 +549,13 @@
                     });
                     currentUserData.avatarUrl = newUrl;
                     updateHeaderUI(true);
-                    selectLevel(0); // Profil neu laden
+                    selectLevel(0);
                 } catch (e) {
                     alert("Fehler beim Speichern des Profilbilds: " + e.message);
                 }
             }
         };
 
-        // Tab System Logik
         window.currentTab = "classic";
 
         const demons = [
@@ -744,11 +736,11 @@
                 name: "Derlery5",
                 currentHardest: "Tung Tung Tung Sahurcles",
                 points: 101,
-                beatenExtremes: ["Tung Tung Tung Sahurcles, Cataclysm", "ACU"]
+                beatenExtremes: ["Tung Tung Tung Sahurcles", "Cataclysm", "ACU"]
             },
             {
                 placement: 2,
-                name: "lLimbu",
+                name: "Limbu",
                 currentHardest: "Sweather Weather",
                 points: 30,
                 beatenExtremes: ["Sweather Weather", "ACU"]
@@ -756,7 +748,7 @@
             {
                 placement: 3,
                 name: "qChrc",
-                currentHardest: "Skelletal Shenanigins",
+                currentHardest: "Skelletal Shenanigans",
                 points: 1,
                 beatenExtremes: []
             },
@@ -844,7 +836,7 @@
                         </div>
                         <div class="info-row">
                             <span class="info-label">Current Hardest:</span>
-                            <span class="info-value my-name">${matchingPlayer.currentHardest}</span>
+                            <span class="info-value highlight-name">${matchingPlayer.currentHardest}</span>
                         </div>
                         <div class="info-row">
                             <span class="info-label">Beaten Extremes:</span>
@@ -884,7 +876,7 @@
                         </div>
                         <div class="info-row">
                             <span class="info-label">Verifier:</span>
-                            <span class="info-value my-name">${demon.myVerifier}</span>
+                            <span class="info-value ${demon.myVerifier === 'Derlery5' ? 'highlight-name' : ''}">${demon.myVerifier}</span>
                         </div>
                         <div class="info-row">
                             <span class="info-label">Original Verifier:</span>
@@ -913,7 +905,7 @@
                         </div>
                         <div class="info-row">
                             <span class="info-label">Current Hardest:</span>
-                            <span class="info-value my-name">${player.currentHardest}</span>
+                            <span class="info-value highlight-name">${player.currentHardest}</span>
                         </div>
                         <div class="info-row">
                             <span class="info-label">Beaten Extremes:</span>
