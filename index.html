@@ -550,6 +550,22 @@
             10: 3.5
         };
 
+        // Automatisches Tier-System basierend auf Schwierigkeit und Platzierung
+        function getTierByRank(difficulty, rank) {
+            if (difficulty === "Easy Demon") return 1;
+            if (difficulty === "Medium Demon") return 2;
+            if (difficulty === "Hard Demon") return 4;
+            if (difficulty === "Insane Demon") return 6;
+
+            // Extreme Demons (Tier-Staffelung nach Platzierung)
+            if (rank <= 3) return 10;
+            if (rank <= 7) return 9;
+            if (rank <= 12) return 8;
+            if (rank <= 20) return 7;
+            if (rank <= 30) return 6;
+            return 5;
+        }
+
         function calculatePoints(difficulty, tier) {
             const base = baseValues[difficulty] || 1;
             const mult = tierMultipliers[tier] || 1.0;
@@ -679,8 +695,8 @@
                         <p><strong>Publisher/Creator:</strong> ${sub.publisher} / ${sub.creator}</p>
                         <p><strong>YouTube ID:</strong> ${sub.youtubeId}</p>
                         <div style="margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
-                            <label style="font-size: 11px;">Tier (1-10):</label>
-                            <input type="number" id="tier-input-${idx}" min="1" max="10" value="5" style="width: 50px; padding: 4px; background: #1a1b23; border: 1px solid #2a2c3a; color: white;">
+                            <label style="font-size: 11px;">Platzierung (Rang):</label>
+                            <input type="number" id="rank-input-${idx}" min="1" max="${demons.length + 1}" value="1" style="width: 60px; padding: 4px; background: #1a1b23; border: 1px solid #2a2c3a; color: white; border-radius: 4px;">
                             <button class="btn-primary" style="width: auto; padding: 4px 10px; margin:0;" onclick="approveSubmission('${sub.id}', ${idx})">Approve</button>
                             <button class="btn-secondary" style="width: auto; padding: 4px 10px; margin:0; color: #ff4d4d; border-color: #ff4d4d;" onclick="rejectSubmission('${sub.id}')">Reject</button>
                         </div>
@@ -709,35 +725,19 @@
             const sub = pendingSubmissions.find(s => s.id === docId);
             if (!sub) return;
 
-            const tierInput = document.getElementById(`tier-input-${idx}`).value;
-            const tier = parseInt(tierInput) || 5;
+            const rankInput = document.getElementById(`rank-input-${idx}`).value;
+            const targetRank = parseInt(rankInput) || 1;
 
-            let rank = demons.length + 1;
+            const autoTier = getTierByRank(sub.difficulty, targetRank);
+            const calculatedPoints = calculatePoints(sub.difficulty, autoTier);
+
             let diffIcon = "easy.webp";
             if (sub.difficulty === "Medium Demon") diffIcon = "medium.webp";
             if (sub.difficulty === "Insane Demon") diffIcon = "insane.png";
             if (sub.difficulty === "Extreme Demon") diffIcon = "extreme.jpg";
 
-            // AREDL Auto-Rating check if Extreme Demon
-            if (sub.difficulty === "Extreme Demon") {
-                try {
-                    const res = await fetch("https://api.aredl.net/v2/demons");
-                    if (res.ok) {
-                        const aredlDemons = await res.json();
-                        const matched = aredlDemons.find(d => d.name.toLowerCase() === sub.name.toLowerCase());
-                        if (matched && matched.position) {
-                            rank = matched.position;
-                        }
-                    }
-                } catch (err) {
-                    console.log("AREDL API not reachable or level not found, placing at end.", err);
-                }
-            }
-
-            const calculatedPoints = calculatePoints(sub.difficulty, tier);
-
             const newDemon = {
-                rank: rank,
+                rank: targetRank,
                 name: sub.name,
                 difficulty: sub.difficulty,
                 difficultyIcon: diffIcon,
@@ -748,14 +748,14 @@
                 victors: [sub.player],
                 youtubeId: sub.youtubeId,
                 description: sub.description || "Community Submission",
-                tier: tier
+                tier: autoTier
             };
 
-            demons.splice(rank - 1, 0, newDemon);
-            // Re-rank remaining
+            // An Zielrang einfügen und nachfolgende Ränge anpassen
+            demons.splice(targetRank - 1, 0, newDemon);
             demons.forEach((d, i) => d.rank = i + 1);
 
-            // Update or Add Player
+            // Spieler in Leaderboard aktualisieren / anlegen
             let playerObj = players.find(p => p.name.toLowerCase() === sub.player.toLowerCase());
             if (!playerObj) {
                 playerObj = {
@@ -774,14 +774,12 @@
                 playerObj.currentHardest = sub.name;
             }
 
-            // Re-sort players by points
             players.sort((a, b) => b.points - a.points);
             players.forEach((p, i) => p.placement = i + 1);
 
-            // Cleanup submission from Firestore
             await deleteDoc(doc(db, "submissions", docId));
 
-            alert(`Level "${sub.name}" approved! Earned ${calculatedPoints} points (Tier ${tier}).`);
+            alert(`Level "${sub.name}" als Platz #${targetRank} genehmigt! (Tier ${autoTier} | ${calculatedPoints} Pkt.)`);
             loadLevelList();
             openAdminModal();
         };
