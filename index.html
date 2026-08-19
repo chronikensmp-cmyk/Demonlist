@@ -502,7 +502,6 @@
         const DEFAULT_AVATAR = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23888888'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/></svg>";
         const OWNER_NAME = "qChrc";
 
-        // VORLAGE: Punktsystem mit Basiswert x Tier-Multiplikator
         const BASE_VALUES = {
             "Easy Demon": 1,
             "Medium Demon": 2,
@@ -612,7 +611,6 @@
             });
         };
 
-        // SUBMIT FORMULAR: Nun ohne Tier, dafür mit Geschätztem Rang & Enjoyment
         window.handleLevelSubmission = async function(e) {
             e.preventDefault();
             const newSub = {
@@ -639,7 +637,6 @@
             }
         };
 
-        // ADMIN BESTÄTIGUNG: Rang UND Tier festlegen
         window.approveSubmission = async function(subId) {
             const sub = submissions.find(s => s.id === subId);
             if (!sub) return;
@@ -774,6 +771,55 @@
                 demons.forEach((d, i) => d.rank = i + 1);
                 recalculatePlayerScores();
                 await saveDemonsToDb();
+                await savePlayersToDb();
+                window.closeEditModal();
+            }
+        };
+
+        // EDIT PLAYER (NUR ADMIN/OWNER)
+        window.openEditPlayerModal = function(index) {
+            const p = players[index];
+            const container = document.getElementById("edit-form-container");
+            document.getElementById("edit-modal-title").textContent = "Edit Player: " + p.name;
+
+            container.innerHTML = `
+                <div class="form-group">
+                    <label>Spieler Name</label>
+                    <input type="text" id="edit-p-name" value="${p.name}">
+                </div>
+                <div class="form-group">
+                    <label>Current Hardest</label>
+                    <input type="text" id="edit-p-hardest" value="${p.currentHardest}">
+                </div>
+                <div class="form-group">
+                    <label>Beaten Extremes (kommagetrennt)</label>
+                    <input type="text" id="edit-p-extremes" value="${(p.beatenExtremes || []).join(", ")}">
+                </div>
+                <p style="font-size: 11px; color: #888; margin-bottom: 10px;">
+                    Hinweis: Punkte werden anhand der gelösten Demons berechnet.
+                </p>
+                <button class="btn-primary" onclick="savePlayerEdits(${index})">Save Changes</button>
+                <button class="btn-danger" style="width:100%; margin-bottom:10px;" onclick="deletePlayer(${index})">Delete Player</button>
+            `;
+            document.getElementById("edit-modal").classList.add("active");
+        };
+
+        window.savePlayerEdits = async function(index) {
+            players[index].name = document.getElementById("edit-p-name").value.trim();
+            players[index].currentHardest = document.getElementById("edit-p-hardest").value.trim();
+            
+            const extremesStr = document.getElementById("edit-p-extremes").value;
+            players[index].beatenExtremes = extremesStr.split(",").map(e => e.trim()).filter(e => e.length > 0);
+
+            recalculatePlayerScores();
+            await savePlayersToDb();
+            window.closeEditModal();
+        };
+
+        window.deletePlayer = async function(index) {
+            if (confirm("Spieler wirklich löschen?")) {
+                players.splice(index, 1);
+                recalculatePlayerScores();
                 await savePlayersToDb();
                 window.closeEditModal();
             }
@@ -1063,12 +1109,19 @@
             const player = players[index];
             if (!player) return;
 
+            let editBtn = isUserAdmin() 
+                ? `<button class="btn-secondary" style="width:auto; font-size:12px; padding:4px 10px;" onclick="openEditPlayerModal(${index})">✏️ Bearbeiten</button>` 
+                : "";
+
             container.innerHTML = `
-                <h1 class="level-title">#${player.placement} - ${player.name}</h1>
+                <div style="display:flex; justify-content:space-between; align-items:center; max-width:650px;">
+                    <h1 class="level-title">#${player.placement} - ${player.name}</h1>
+                    ${editBtn}
+                </div>
                 <p class="description">Player Profile</p>
                 <div class="info-card">
                     <div class="info-row"><span class="info-label">Placement:</span><span class="info-value">#${player.placement}</span></div>
-                    <div class="info-row"><span class="info-label">Points:</span><span class="info-value">${player.points}</span></div>
+                    <div class="info-row"><span class="info-label">Points:</span><span class="info-value highlight-name">${player.points} pts</span></div>
                     <div class="info-row"><span class="info-label">Current Hardest:</span><span class="info-value highlight-name">${player.currentHardest}</span></div>
                     <div class="info-row"><span class="info-label">Beaten Extremes:</span><span class="info-value">${(player.beatenExtremes && player.beatenExtremes.length > 0) ? player.beatenExtremes.join(", ") : "None"}</span></div>
                 </div>
