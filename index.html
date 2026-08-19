@@ -482,7 +482,7 @@
             onSnapshot
         } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // Fallback Initial Data (Nach oben verschoben wegen Initialisierung)
+        // Fallback Initial Data
         const initialDemons = [
             { rank: 1, name: "Tung Tung Tung Sahurcles", difficulty: "Extreme Demon", tier: 10, publisher: "ArraegenGD", creator: "ArraegenGD", myVerifier: "Derlery5", originalVerifier: "Nova4664", victors: ["Player1", "Player2"], youtubeId: "JCAOQQu4Iy0", description: "Tripple T" },
             { rank: 2, name: "Cataclysm", difficulty: "Extreme Demon", tier: 3, publisher: "Ggb0y", creator: "Ggb0y", myVerifier: "Derlery5", originalVerifier: "Riot", victors: ["Player1"], youtubeId: "Kd-G_pd3OPw", description: "~6200 Attempts." },
@@ -543,7 +543,7 @@
 
         window.currentTab = "classic";
 
-        // Global Scope bindings
+        // Window Bindings für HTML OnClick Handlers
         window.switchTab = function(tab) {
             window.currentTab = tab;
             document.getElementById("tab-classic").classList.toggle("active", tab === "classic");
