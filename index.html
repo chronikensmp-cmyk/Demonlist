@@ -5,367 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>German Demonlist</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #121318; color: #e0e0e0; height: 100vh; overflow: hidden; }
+        .app-container { display: flex; height: 100vh; flex-direction: column; }
+        @media (min-width: 600px) { .app-container { flex-direction: row; } }
+        
+        .sidebar { width: 100%; background-color: #1a1b23; border-bottom: 1px solid #2a2c3a; display: flex; flex-direction: column; padding: 15px; max-height: 40vh; }
+        @media (min-width: 600px) { .sidebar { width: 340px; max-height: 100vh; border-right: 1px solid #2a2c3a; border-bottom: none; } }
+        
+        .logo { font-size: 22px; font-weight: bold; color: #fff; margin-bottom: 10px; cursor: pointer; }
+        .logo-highlight { color: #ff6b00; }
+        .tabs { display: flex; gap: 5px; margin-bottom: 10px; flex-wrap: wrap; }
+        .tab { background: none; border: none; color: #888; border-bottom: 2px solid transparent; padding: 5px 8px; font-weight: bold; font-size: 12px; cursor: pointer; }
+        .tab.active { color: #ff6b00; border-bottom: 2px solid #ff6b00; }
+        #search { width: 100%; padding: 8px 12px; background-color: #121318; border: 1px solid #2a2c3a; border-radius: 6px; color: white; margin-bottom: 10px; }
+        .level-list { list-style: none; overflow-y: auto; flex-grow: 1; }
+        .level-item { padding: 10px; border-radius: 6px; margin-bottom: 5px; cursor: pointer; background-color: #21232e; display: flex; justify-content: space-between; align-items: center; }
+        .level-item.active { background-color: #ff6b00; color: white; }
+        .rank { font-weight: bold; margin-right: 8px; }
 
-        body {
-            background-color: #121318;
-            color: #e0e0e0;
-            height: 100vh;
-            overflow: hidden;
-        }
+        .main-wrapper { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .top-header { background-color: #1a1b23; border-bottom: 1px solid #2a2c3a; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .account-btn { display: flex; align-items: center; gap: 10px; background-color: #21232e; border: 1px solid #2a2c3a; padding: 6px 12px; border-radius: 20px; cursor: pointer; color: #fff; font-weight: bold; font-size: 14px; }
+        .account-btn:hover { background-color: #2a2c3a; }
+        .avatar-img { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; background-color: #2a2c3a; }
+        
+        .content { flex-grow: 1; padding: 20px; overflow-y: auto; }
+        .level-title { font-size: 28px; margin-bottom: 8px; }
+        .description { color: #aaa; margin-bottom: 15px; font-size: 14px; }
+        .video-container { position: relative; width: 100%; max-width: 650px; aspect-ratio: 16 / 9; margin-bottom: 15px; border-radius: 8px; overflow: hidden; background: #000; }
+        .video-container iframe { width: 100%; height: 100%; border: none; }
+        
+        .info-card { background-color: #1a1b23; padding: 15px; border-radius: 8px; max-width: 650px; border: 1px solid #2a2c3a; margin-bottom: 15px; }
+        .info-row { margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2a2c3a; padding-bottom: 6px; font-size: 14px; }
+        .info-label { color: #888; font-weight: bold; }
+        .info-value { color: #fff; display: flex; align-items: center; gap: 8px; }
+        .highlight-name { color: #ff6b00; font-weight: bold; }
 
-        .app-container {
-            display: flex;
-            height: 100vh;
-            flex-direction: column;
-        }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); z-index: 1000; justify-content: center; align-items: center; }
+        .modal.active { display: flex; }
+        .modal-content { background-color: #1a1b23; border: 1px solid #2a2c3a; border-radius: 8px; padding: 25px; width: 90%; max-width: 450px; max-height: 90vh; overflow-y: auto; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); }
+        .modal-title { font-size: 20px; margin-bottom: 15px; color: #fff; }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 12px; color: #888; margin-bottom: 4px; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; background-color: #121318; border: 1px solid #2a2c3a; border-radius: 6px; color: #fff; }
+        .checkbox-group { display: flex; align-items: center; gap: 8px; margin-bottom: 15px; font-size: 13px; color: #aaa; }
+        
+        .btn-primary { width: 100%; padding: 10px; background-color: #ff6b00; border: none; border-radius: 6px; color: white; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
+        .btn-secondary { width: 100%; padding: 8px; background-color: transparent; border: 1px solid #2a2c3a; border-radius: 6px; color: #888; cursor: pointer; }
+        .btn-danger { background-color: #e74c3c; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; }
+        .btn-success { background-color: #2ecc71; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; }
+        .error-message { color: #ff4d4d; font-size: 12px; margin-bottom: 10px; display: none; }
 
-        @media (min-width: 600px) {
-            .app-container {
-                flex-direction: row;
-            }
-        }
-
-        .sidebar {
-            width: 100%;
-            background-color: #1a1b23;
-            border-bottom: 1px solid #2a2c3a;
-            display: flex;
-            flex-direction: column;
-            padding: 15px;
-            max-height: 40vh;
-        }
-
-        @media (min-width: 600px) {
-            .sidebar {
-                width: 340px;
-                max-height: 100vh;
-                border-right: 1px solid #2a2c3a;
-                border-bottom: none;
-            }
-        }
-
-        .logo {
-            font-size: 22px;
-            font-weight: bold;
-            color: #fff;
-            margin-bottom: 10px;
-            cursor: pointer;
-        }
-
-        .logo-highlight {
-            color: #ff6b00;
-        }
-
-        .tabs {
-            display: flex;
-            gap: 5px;
-            margin-bottom: 10px;
-            flex-wrap: wrap;
-        }
-
-        .tab {
-            background: none;
-            border: none;
-            color: #888;
-            border-bottom: 2px solid transparent;
-            padding: 5px 8px;
-            font-weight: bold;
-            font-size: 12px;
-            cursor: pointer;
-        }
-
-        .tab.active {
-            color: #ff6b00;
-            border-bottom: 2px solid #ff6b00;
-        }
-
-        #search {
-            width: 100%;
-            padding: 8px 12px;
-            background-color: #121318;
-            border: 1px solid #2a2c3a;
-            border-radius: 6px;
-            color: white;
-            margin-bottom: 10px;
-        }
-
-        .level-list {
-            list-style: none;
-            overflow-y: auto;
-            flex-grow: 1;
-        }
-
-        .level-item {
-            padding: 10px;
-            border-radius: 6px;
-            margin-bottom: 5px;
-            cursor: pointer;
-            background-color: #21232e;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .level-item.active {
-            background-color: #ff6b00;
-            color: white;
-        }
-
-        .rank {
-            font-weight: bold;
-            margin-right: 8px;
-        }
-
-        .main-wrapper {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .top-header {
-            background-color: #1a1b23;
-            border-bottom: 1px solid #2a2c3a;
-            padding: 10px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .account-btn {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background-color: #21232e;
-            border: 1px solid #2a2c3a;
-            padding: 6px 12px;
-            border-radius: 20px;
-            cursor: pointer;
-            color: #fff;
-            font-weight: bold;
-            font-size: 14px;
-        }
-
-        .account-btn:hover {
-            background-color: #2a2c3a;
-        }
-
-        .avatar-img {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            object-fit: cover;
-            background-color: #2a2c3a;
-        }
-
-        .content {
-            flex-grow: 1;
-            padding: 20px;
-            overflow-y: auto;
-        }
-
-        .level-title {
-            font-size: 28px;
-            margin-bottom: 8px;
-        }
-
-        .description {
-            color: #aaa;
-            margin-bottom: 15px;
-            font-size: 14px;
-        }
-
-        .video-container {
-            position: relative;
-            width: 100%;
-            max-width: 650px;
-            aspect-ratio: 16 / 9;
-            margin-bottom: 15px;
-            border-radius: 8px;
-            overflow: hidden;
-            background: #000;
-        }
-
-        .video-container iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        .info-card {
-            background-color: #1a1b23;
-            padding: 15px;
-            border-radius: 8px;
-            max-width: 650px;
-            border: 1px solid #2a2c3a;
-            margin-bottom: 15px;
-        }
-
-        .info-row {
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #2a2c3a;
-            padding-bottom: 6px;
-            font-size: 14px;
-        }
-
-        .info-label {
-            color: #888;
-            font-weight: bold;
-        }
-
-        .info-value {
-            color: #fff;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .highlight-name {
-            color: #ff6b00;
-            font-weight: bold;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background-color: #1a1b23;
-            border: 1px solid #2a2c3a;
-            border-radius: 8px;
-            padding: 25px;
-            width: 90%;
-            max-width: 450px;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-        }
-
-        .modal-title {
-            font-size: 20px;
-            margin-bottom: 15px;
-            color: #fff;
-        }
-
-        .form-group {
-            margin-bottom: 12px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 12px;
-            color: #888;
-            margin-bottom: 4px;
-        }
-
-        .form-group input, .form-group select, .form-group textarea {
-            width: 100%;
-            padding: 10px;
-            background-color: #121318;
-            border: 1px solid #2a2c3a;
-            border-radius: 6px;
-            color: #fff;
-        }
-
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 15px;
-            font-size: 13px;
-            color: #aaa;
-        }
-
-        .btn-primary {
-            width: 100%;
-            padding: 10px;
-            background-color: #ff6b00;
-            border: none;
-            border-radius: 6px;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            margin-bottom: 10px;
-        }
-
-        .btn-secondary {
-            width: 100%;
-            padding: 8px;
-            background-color: transparent;
-            border: 1px solid #2a2c3a;
-            border-radius: 6px;
-            color: #888;
-            cursor: pointer;
-        }
-
-        .btn-danger {
-            background-color: #e74c3c;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-        .btn-success {
-            background-color: #2ecc71;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-        .error-message {
-            color: #ff4d4d;
-            font-size: 12px;
-            margin-bottom: 10px;
-            display: none;
-        }
-
-        .profile-avatar-large {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin: 0 auto 15px auto;
-            display: block;
-            border: 2px solid #ff6b00;
-            background-color: #2a2c3a;
-        }
-
-        .badge {
-            font-size: 10px;
-            padding: 2px 6px;
-            border-radius: 4px;
-            background-color: #ff6b00;
-            color: white;
-            margin-left: 5px;
-            text-transform: uppercase;
-        }
-
+        .badge { font-size: 10px; padding: 2px 6px; border-radius: 4px; background-color: #ff6b00; color: white; margin-left: 5px; text-transform: uppercase; }
         .badge-owner { background-color: #e74c3c; }
         .badge-admin { background-color: #3498db; }
     </style>
@@ -374,16 +66,16 @@
 
     <div class="app-container">
         <aside class="sidebar">
-            <div class="logo" onclick="switchTab('classic')">
+            <div class="logo" onclick="window.switchTab('classic')">
                 <span class="logo-highlight">German</span> Demonlist
             </div>
             <div class="tabs">
-                <button class="tab active" id="tab-classic" onclick="switchTab('classic')">CLASSIC</button>
-                <button class="tab" id="tab-players" onclick="switchTab('players')">PLAYERS</button>
-                <button class="tab" id="tab-submit" onclick="switchTab('submit')">SUBMIT</button>
-                <button class="tab" id="tab-pending" onclick="switchTab('pending')" style="display:none;">PENDING</button>
+                <button class="tab active" id="tab-classic" onclick="window.switchTab('classic')">CLASSIC</button>
+                <button class="tab" id="tab-players" onclick="window.switchTab('players')">PLAYERS</button>
+                <button class="tab" id="tab-submit" onclick="window.switchTab('submit')">SUBMIT</button>
+                <button class="tab" id="tab-pending" onclick="window.switchTab('pending')" style="display:none;">PENDING</button>
             </div>
-            <input type="text" id="search" placeholder="Search..." onkeyup="filterLevels()">
+            <input type="text" id="search" placeholder="Search..." onkeyup="window.filterLevels()">
             <ul id="level-list" class="level-list"></ul>
         </aside>
 
@@ -392,7 +84,7 @@
                 <div>
                     <span id="role-badge" class="badge" style="display:none;"></span>
                 </div>
-                <button class="account-btn" onclick="handleAccountClick()">
+                <button class="account-btn" onclick="window.handleAccountClick()">
                     <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23888888'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/></svg>" id="header-avatar" class="avatar-img" alt="Avatar">
                     <span id="header-username">Log In / Register</span>
                 </button>
@@ -410,7 +102,7 @@
             <h2 class="modal-title" id="auth-title">Log In</h2>
             <div class="error-message" id="auth-error"></div>
             
-            <form id="auth-form" onsubmit="handleAuthSubmit(event)">
+            <form id="auth-form" onsubmit="window.handleAuthSubmit(event)">
                 <div class="form-group" id="username-group" style="display: none;">
                     <label for="auth-username">Ingame Username</label>
                     <input type="text" id="auth-username" placeholder="e.g. Derlery5">
@@ -429,8 +121,8 @@
                 </div>
 
                 <button type="submit" class="btn-primary" id="auth-submit-btn">Log In</button>
-                <button type="button" class="btn-secondary" onclick="toggleAuthMode()" id="auth-toggle-btn">Need an account? Register</button>
-                <button type="button" class="btn-secondary" onclick="closeAuthModal()" style="margin-top: 5px;">Cancel</button>
+                <button type="button" class="btn-secondary" onclick="window.toggleAuthMode()" id="auth-toggle-btn">Need an account? Register</button>
+                <button type="button" class="btn-secondary" onclick="window.closeAuthModal()" style="margin-top: 5px;">Cancel</button>
             </form>
         </div>
     </div>
@@ -440,7 +132,7 @@
         <div class="modal-content">
             <h2 class="modal-title" id="edit-modal-title">Edit Item</h2>
             <div id="edit-form-container"></div>
-            <button type="button" class="btn-secondary" onclick="closeEditModal()">Cancel</button>
+            <button type="button" class="btn-secondary" onclick="window.closeEditModal()">Cancel</button>
         </div>
     </div>
 
@@ -461,11 +153,9 @@
             doc, 
             setDoc, 
             getDoc,
-            getDocs,
             collection,
             addDoc,
             deleteDoc,
-            updateDoc,
             onSnapshot
         } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
@@ -477,8 +167,8 @@
         }
 
         const initialDemons = [
-            { rank: 1, name: "Tung Tung Tung Sahurcles", difficulty: "Extreme Demon", tier: 10, enjoyment: "90%", publisher: "ArraegenGD", creator: "ArraegenGD", myVerifier: "Derlery5", originalVerifier: "Nova4664", victors: ["Player1", "Player2"], youtubeId: "JCAOQQu4Iy0", description: "Tripple T" },
-            { rank: 2, name: "Cataclysm", difficulty: "Extreme Demon", tier: 3, enjoyment: "75%", publisher: "Ggb0y", creator: "Ggb0y", myVerifier: "Derlery5", originalVerifier: "Riot", victors: ["Player1"], youtubeId: "Kd-G_pd3OPw", description: "~6200 Attempts." }
+            { rank: 1, name: "Tung Tung Tung Sahurcles", difficulty: "Extreme Demon", enjoyment: "90%", publisher: "ArraegenGD", creator: "ArraegenGD", myVerifier: "Derlery5", originalVerifier: "Nova4664", victors: ["Player1", "Player2"], youtubeId: "JCAOQQu4Iy0", description: "Tripple T" },
+            { rank: 2, name: "Cataclysm", difficulty: "Extreme Demon", enjoyment: "75%", publisher: "Ggb0y", creator: "Ggb0y", myVerifier: "Derlery5", originalVerifier: "Riot", victors: ["Player1"], youtubeId: "Kd-G_pd3OPw", description: "~6200 Attempts." }
         ];
 
         const initialPlayers = [
@@ -515,8 +205,24 @@
             6: 2.0, 7: 2.3, 8: 2.6, 9: 3.0, 10: 3.5
         };
 
-        function calculateScore(category, tier) {
+        // AUTOMATISCHE TIER-BERECHNUNG DURCH DIE PLATZIERUNG (RANK)
+        function calculateAutoTier(rank, totalLevels) {
+            const count = Math.max(totalLevels || 1, 10);
+            if (rank <= Math.ceil(count * 0.05)) return 10;
+            if (rank <= Math.ceil(count * 0.10)) return 9;
+            if (rank <= Math.ceil(count * 0.18)) return 8;
+            if (rank <= Math.ceil(count * 0.28)) return 7;
+            if (rank <= Math.ceil(count * 0.40)) return 6;
+            if (rank <= Math.ceil(count * 0.53)) return 5;
+            if (rank <= Math.ceil(count * 0.67)) return 4;
+            if (rank <= Math.ceil(count * 0.80)) return 3;
+            if (rank <= Math.ceil(count * 0.92)) return 2;
+            return 1;
+        }
+
+        function calculateScore(category, rank, totalLevels) {
             const base = BASE_VALUES[category] || 1;
+            const tier = calculateAutoTier(rank, totalLevels);
             const mult = TIER_MULTIPLIERS[tier] || 1.0;
             return Math.round((base * mult) * 10) / 10;
         }
@@ -531,6 +237,14 @@
 
         window.currentTab = "classic";
 
+        function isUserAdmin() {
+            return currentUserData && (currentUserData.role === "admin" || currentUserData.role === "owner" || currentUserData.username === OWNER_NAME);
+        }
+
+        function isUserOwner() {
+            return currentUserData && (currentUserData.role === "owner" || currentUserData.username === OWNER_NAME);
+        }
+
         window.switchTab = function(tab) {
             window.currentTab = tab;
             document.getElementById("tab-classic").classList.toggle("active", tab === "classic");
@@ -543,8 +257,8 @@
         };
 
         window.handleAccountClick = function() {
-            if (auth.currentUser) switchTab('profile');
-            else openAuthModal();
+            if (auth.currentUser) window.switchTab('profile');
+            else window.openAuthModal();
         };
 
         window.openAuthModal = function() {
@@ -595,7 +309,7 @@
 
         window.handleLogout = async function() {
             await signOut(auth);
-            switchTab('classic');
+            window.switchTab('classic');
         };
 
         window.filterLevels = function() {
@@ -631,7 +345,7 @@
             try {
                 await addDoc(collection(db, "submissions"), newSub);
                 alert("Einreichung gesendet! Admins werden deinen Vorschlag prüfen.");
-                switchTab("classic");
+                window.switchTab("classic");
             } catch (err) {
                 alert("Fehler beim Einreichen: " + err.message);
             }
@@ -642,7 +356,6 @@
             if (!sub) return;
 
             const finalRank = parseInt(document.getElementById("approve-rank").value) || 1;
-            const finalTier = parseInt(document.getElementById("approve-tier").value) || 1;
 
             const existingDemonIndex = demons.findIndex(d => d.name.toLowerCase() === sub.name.toLowerCase());
 
@@ -657,7 +370,6 @@
                     rank: finalRank,
                     name: sub.name,
                     difficulty: sub.difficulty,
-                    tier: finalTier,
                     enjoyment: sub.enjoyment || "N/A",
                     publisher: sub.publisher,
                     creator: sub.creator,
@@ -690,7 +402,7 @@
                 await deleteDoc(doc(db, "submissions", subId));
 
                 alert("Level freigegeben und gespeichert!");
-                switchTab("classic");
+                window.switchTab("classic");
             } catch (error) {
                 alert("Fehler beim Speichern: " + error.message);
             }
@@ -699,11 +411,10 @@
         window.rejectSubmission = async function(subId) {
             if (confirm("Einreichung ablehnen?")) {
                 await deleteDoc(doc(db, "submissions", subId));
-                switchTab("pending");
+                window.switchTab("pending");
             }
         };
 
-        // EDIT DEMON (NUR OWNER DARF ENJOYMENT ANPASSEN)
         window.openEditDemonModal = function(index) {
             const d = demons[index];
             const container = document.getElementById("edit-form-container");
@@ -721,11 +432,6 @@
                         ${Object.keys(BASE_VALUES).map(k => `<option value="${k}" ${d.difficulty === k ? 'selected' : ''}>${k}</option>`).join("")}
                     </select>
                 </div>
-                <div class="form-group"><label>Tier (1-10)</label>
-                    <select id="edit-d-tier">
-                        ${[1,2,3,4,5,6,7,8,9,10].map(t => `<option value="${t}" ${(d.tier||1) == t ? 'selected' : ''}>Tier ${t}</option>`).join("")}
-                    </select>
-                </div>
                 ${ownerOnlyEnjoymentField}
                 <div class="form-group"><label>Publisher</label><input type="text" id="edit-d-publisher" value="${d.publisher}"></div>
                 <div class="form-group"><label>Creator</label><input type="text" id="edit-d-creator" value="${d.creator}"></div>
@@ -733,8 +439,8 @@
                 <div class="form-group"><label>Original Verifier</label><input type="text" id="edit-d-orig" value="${d.originalVerifier}"></div>
                 <div class="form-group"><label>Victors (kommagetrennt)</label><input type="text" id="edit-d-victors" value="${(d.victors||[]).join(", ")}"></div>
                 <div class="form-group"><label>YouTube Link or ID</label><input type="text" id="edit-d-yt" value="${d.youtubeId}"></div>
-                <button class="btn-primary" onclick="saveDemonEdits(${index})">Save Changes</button>
-                <button class="btn-danger" style="width:100%; margin-bottom:10px;" onclick="deleteDemon(${index})">Delete Level</button>
+                <button class="btn-primary" onclick="window.saveDemonEdits(${index})">Save Changes</button>
+                <button class="btn-danger" style="width:100%; margin-bottom:10px;" onclick="window.deleteDemon(${index})">Delete Level</button>
             `;
             document.getElementById("edit-modal").classList.add("active");
         };
@@ -743,7 +449,6 @@
             demons[index].rank = parseInt(document.getElementById("edit-d-rank").value);
             demons[index].name = document.getElementById("edit-d-name").value.trim();
             demons[index].difficulty = document.getElementById("edit-d-diff").value;
-            demons[index].tier = parseInt(document.getElementById("edit-d-tier").value);
             
             if (isUserOwner() && document.getElementById("edit-d-enjoyment")) {
                 demons[index].enjoyment = document.getElementById("edit-d-enjoyment").value.trim();
@@ -776,7 +481,6 @@
             }
         };
 
-        // EDIT PLAYER (NUR ADMIN/OWNER)
         window.openEditPlayerModal = function(index) {
             const p = players[index];
             const container = document.getElementById("edit-form-container");
@@ -795,11 +499,8 @@
                     <label>Beaten Extremes (kommagetrennt)</label>
                     <input type="text" id="edit-p-extremes" value="${(p.beatenExtremes || []).join(", ")}">
                 </div>
-                <p style="font-size: 11px; color: #888; margin-bottom: 10px;">
-                    Hinweis: Punkte werden anhand der gelösten Demons berechnet.
-                </p>
-                <button class="btn-primary" onclick="savePlayerEdits(${index})">Save Changes</button>
-                <button class="btn-danger" style="width:100%; margin-bottom:10px;" onclick="deletePlayer(${index})">Delete Player</button>
+                <button class="btn-primary" onclick="window.savePlayerEdits(${index})">Save Changes</button>
+                <button class="btn-danger" style="width:100%; margin-bottom:10px;" onclick="window.deletePlayer(${index})">Delete Player</button>
             `;
             document.getElementById("edit-modal").classList.add("active");
         };
@@ -844,15 +545,8 @@
                 updateHeaderUI(false);
             }
             toggleAdminTabs();
+            loadLevelList();
         });
-
-        function isUserAdmin() {
-            return currentUserData && (currentUserData.role === "admin" || currentUserData.role === "owner" || currentUserData.username === OWNER_NAME);
-        }
-
-        function isUserOwner() {
-            return currentUserData && (currentUserData.role === "owner" || currentUserData.username === OWNER_NAME);
-        }
 
         function toggleAdminTabs() {
             document.getElementById("tab-pending").style.display = isUserAdmin() ? "inline-block" : "none";
@@ -927,7 +621,7 @@
                     const isVictor = demon.victors && demon.victors.some(v => v.toLowerCase() === player.name.toLowerCase());
 
                     if (isVerifier || isVictor) {
-                        pts += calculateScore(demon.difficulty, demon.tier || 1);
+                        pts += calculateScore(demon.difficulty, demon.rank, demons.length);
                         if (demon.difficulty === "Extreme Demon") beatenExtremes.push(demon.name);
                         if (demon.rank < hardestRank) {
                             hardestRank = demon.rank;
@@ -963,7 +657,8 @@
                 li.onclick = () => selectLevel(index);
 
                 if (window.currentTab === "classic") {
-                    li.innerHTML = `<div><span class="rank">#${item.rank}</span> <span>${item.name}</span></div> <span style="font-size:11px; opacity:0.8;">Tier ${item.tier || 1}</span>`;
+                    const autoTier = calculateAutoTier(item.rank, demons.length);
+                    li.innerHTML = `<div><span class="rank">#${item.rank}</span> <span>${item.name}</span></div> <span style="font-size:11px; opacity:0.8;">Tier ${autoTier}</span>`;
                 } else if (window.currentTab === "players") {
                     li.innerHTML = `<div><span class="rank">#${item.placement}</span> <span>${item.name}</span></div> <span style="font-weight:bold;">${item.points} pt</span>`;
                 } else if (window.currentTab === "pending") {
@@ -984,10 +679,33 @@
             const container = document.getElementById("level-details");
             if (!container) return;
 
-            if (window.currentTab === "submit") renderSubmitView(container);
+            if (window.currentTab === "profile") renderMyProfile(container);
+            else if (window.currentTab === "submit") renderSubmitView(container);
             else if (window.currentTab === "classic") renderDemonDetails(container, index);
             else if (window.currentTab === "players") renderPlayerDetails(container, index);
             else if (window.currentTab === "pending") renderPendingDetails(container, index);
+        }
+
+        function renderMyProfile(container) {
+            if (!currentUserData) {
+                container.innerHTML = `<h1 class="level-title">Profile</h1><p class="description">Du bist nicht angemeldet.</p>`;
+                return;
+            }
+
+            const myPlayerData = players.find(p => p.name.toLowerCase() === currentUserData.username.toLowerCase());
+
+            container.innerHTML = `
+                <h1 class="level-title">Mein Profil: ${currentUserData.username}</h1>
+                <p class="description">Role: <strong>${(currentUserData.role || 'User').toUpperCase()}</strong></p>
+
+                <div class="info-card">
+                    <div class="info-row"><span class="info-label">List Platzierung:</span><span class="info-value">${myPlayerData ? '#' + myPlayerData.placement : 'Nicht gelistet'}</span></div>
+                    <div class="info-row"><span class="info-label">Punkte:</span><span class="info-value highlight-name">${myPlayerData ? myPlayerData.points + ' pts' : '0 pts'}</span></div>
+                    <div class="info-row"><span class="info-label">Current Hardest:</span><span class="info-value highlight-name">${myPlayerData ? myPlayerData.currentHardest : 'Keins'}</span></div>
+                </div>
+
+                <button class="btn-danger" style="max-width:200px;" onclick="window.handleLogout()">Abmelden</button>
+            `;
         }
 
         function renderSubmitView(container) {
@@ -1001,7 +719,7 @@
                 <p class="description">Reiche ein neues Level ein.</p>
 
                 <div class="info-card">
-                    <form onsubmit="handleLevelSubmission(event)">
+                    <form onsubmit="window.handleLevelSubmission(event)">
                         <div class="form-group">
                             <label>Level Name</label>
                             <input type="text" id="sub-name" required placeholder="e.g. Bloodbath">
@@ -1041,8 +759,9 @@
             if (!demon) return;
 
             const cleanYtId = extractYouTubeId(demon.youtubeId);
-            const calculatedPoints = calculateScore(demon.difficulty, demon.tier || 1);
-            let editBtn = isUserAdmin() ? `<button class="btn-secondary" style="width:auto; font-size:12px; padding:4px 10px;" onclick="openEditDemonModal(${index})">✏️ Bearbeiten</button>` : "";
+            const autoTier = calculateAutoTier(demon.rank, demons.length);
+            const calculatedPoints = calculateScore(demon.difficulty, demon.rank, demons.length);
+            let editBtn = isUserAdmin() ? `<button class="btn-secondary" style="width:auto; font-size:12px; padding:4px 10px;" onclick="window.openEditDemonModal(${index})">✏️ Bearbeiten</button>` : "";
 
             container.innerHTML = `
                 <div style="display:flex; justify-content:space-between; align-items:center; max-width:650px;">
@@ -1056,7 +775,7 @@
                 </div>
 
                 <div class="info-card">
-                    <div class="info-row"><span class="info-label">Difficulty / Tier:</span><span class="info-value">${demon.difficulty} (Tier ${demon.tier || 1})</span></div>
+                    <div class="info-row"><span class="info-label">Difficulty / Auto-Tier:</span><span class="info-value">${demon.difficulty} (Tier ${autoTier})</span></div>
                     <div class="info-row"><span class="info-label">Enjoyment Rating:</span><span class="info-value highlight-name">${demon.enjoyment || 'N/A'}</span></div>
                     <div class="info-row"><span class="info-label">Score Value:</span><span class="info-value highlight-name">${calculatedPoints} Points</span></div>
                     <div class="info-row"><span class="info-label">Publisher:</span><span class="info-value">${demon.publisher}</span></div>
@@ -1087,19 +806,14 @@
 
                 <div class="info-card">
                     <h3 style="margin-bottom:10px;">Approval Options (Admin/Owner)</h3>
+                    <p style="font-size:12px; color:#aaa; margin-bottom:10px;">Das Tier wird automatisch anhand des Rangs berechnet.</p>
                     <div class="form-group">
                         <label>Finale Platzierung / Rank (1 - ${demons.length + 1})</label>
                         <input type="number" id="approve-rank" min="1" max="${demons.length + 1}" value="${sub.estimatedRank || 1}">
                     </div>
-                    <div class="form-group">
-                        <label>Finales Tier (1-10 festlegen)</label>
-                        <select id="approve-tier">
-                            ${[1,2,3,4,5,6,7,8,9,10].map(t => `<option value="${t}">Tier ${t} (${TIER_MULTIPLIERS[t]}x Multiplikator)</option>`).join("")}
-                        </select>
-                    </div>
                     <div style="display:flex; gap:10px;">
-                        <button class="btn-success" style="flex-grow:1;" onclick="approveSubmission('${sub.id}')">Accept Level</button>
-                        <button class="btn-danger" style="flex-grow:1;" onclick="rejectSubmission('${sub.id}')">Reject</button>
+                        <button class="btn-success" style="flex-grow:1;" onclick="window.approveSubmission('${sub.id}')">Accept Level</button>
+                        <button class="btn-danger" style="flex-grow:1;" onclick="window.rejectSubmission('${sub.id}')">Reject</button>
                     </div>
                 </div>
             `;
@@ -1109,8 +823,9 @@
             const player = players[index];
             if (!player) return;
 
-            let editBtn = isUserAdmin() 
-                ? `<button class="btn-secondary" style="width:auto; font-size:12px; padding:4px 10px;" onclick="openEditPlayerModal(${index})">✏️ Bearbeiten</button>` 
+            const isSelf = currentUserData && player.name.toLowerCase() === currentUserData.username.toLowerCase();
+            let editBtn = (isUserAdmin() || isSelf) 
+                ? `<button class="btn-secondary" style="width:auto; font-size:12px; padding:4px 10px;" onclick="window.openEditPlayerModal(${index})">✏️ Bearbeiten</button>` 
                 : "";
 
             container.innerHTML = `
