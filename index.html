@@ -269,7 +269,7 @@
         </div>
     </div>
 
-    <!-- Firebase Script mit Echtzeit-Synchronisation -->
+    <!-- Firebase Script -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { 
@@ -323,6 +323,17 @@
 
         const OWNER_NAME = "qchrc"; 
 
+        // Initialdaten für den einmaligen automatischen Upload
+        const initialDemonsData = [
+            { rank: 1, name: "Acheron", difficulty: "Extreme Demon", difficultyIcon: "extreme.jpg", publisher: "ryu", creator: "ryu & more", myVerifier: "qChrc", originalVerifier: "Zoink", victors: [], youtubeId: "L8S3pG1k3YI", description: "Top 1 Demon in Germany", tier: 10 },
+            { rank: 2, name: "Slaughterhouse", difficulty: "Extreme Demon", difficultyIcon: "extreme.jpg", publisher: "IcEDCave", creator: "IcEDCave & more", myVerifier: "qChrc", originalVerifier: "Doggie", victors: ["Player1"], youtubeId: "7L8I0aB5I4c", description: "Insane wave control", tier: 9 }
+        ];
+
+        const initialPlayersData = [
+            { placement: 1, name: "qChrc", points: 35.0, currentHardest: "Acheron", beatenExtremes: ["Acheron", "Slaughterhouse"] },
+            { placement: 2, name: "Player1", points: 15.0, currentHardest: "Slaughterhouse", beatenExtremes: ["Slaughterhouse"] }
+        ];
+
         const baseValues = {
             "Easy Demon": 1,
             "Medium Demon": 2,
@@ -373,19 +384,23 @@
         // --- FIRESTORE ECHTZEIT-LISTEN (Persistent Database) ---
         function syncDataFromFirebase() {
             onSnapshot(doc(db, "listdata", "demons"), (docSnap) => {
-                if (docSnap.exists()) {
-                    demons = docSnap.data().items || [];
+                if (docSnap.exists() && docSnap.data().items && docSnap.data().items.length > 0) {
+                    demons = docSnap.data().items;
                 } else {
-                    saveDemonsToFirebase([]);
+                    // Falls die Datenbank noch leer ist, spiele automatisch die Initialdaten ein
+                    saveDemonsToFirebase(initialDemonsData);
+                    demons = initialDemonsData;
                 }
                 loadLevelList();
             });
 
             onSnapshot(doc(db, "listdata", "players"), (docSnap) => {
-                if (docSnap.exists()) {
-                    players = docSnap.data().items || [];
+                if (docSnap.exists() && docSnap.data().items && docSnap.data().items.length > 0) {
+                    players = docSnap.data().items;
                 } else {
-                    savePlayersToFirebase([]);
+                    // Falls die Datenbank noch leer ist, spiele automatisch die Initialdaten ein
+                    savePlayersToFirebase(initialPlayersData);
+                    players = initialPlayersData;
                 }
                 loadLevelList();
             });
