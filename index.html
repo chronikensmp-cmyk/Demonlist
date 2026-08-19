@@ -71,25 +71,25 @@
     <div class="app-container">
         <!-- Sidebar -->
         <aside class="sidebar">
-            <div class="logo" onclick="switchTab('classic')">
+            <div class="logo" onclick="window.switchTab('classic')">
                 <span class="logo-highlight">German</span> Demonlist
             </div>
             <div class="tabs">
-                <button class="tab active" id="tab-classic" onclick="switchTab('classic')">CLASSIC</button>
-                <button class="tab" id="tab-players" onclick="switchTab('players')">PLAYERS</button>
+                <button class="tab active" id="tab-classic" onclick="window.switchTab('classic')">CLASSIC</button>
+                <button class="tab" id="tab-players" onclick="window.switchTab('players')">PLAYERS</button>
             </div>
-            <input type="text" id="search" placeholder="Search..." onkeyup="filterLevels()">
-            <button class="btn-primary" style="margin-bottom: 10px;" onclick="openSubmitModal()">+ Submit Level</button>
+            <input type="text" id="search" placeholder="Search..." onkeyup="window.filterLevels()">
+            <button class="btn-primary" style="margin-bottom: 10px;" onclick="window.openSubmitModal()">+ Submit Level</button>
             <ul id="level-list" class="level-list"></ul>
         </aside>
 
         <!-- Main Wrapper -->
         <div class="main-wrapper">
             <header class="top-header">
-                <button id="admin-pending-btn" class="account-btn" style="display: none; border-color: #ff6b00;" onclick="openAdminModal()">
+                <button id="admin-pending-btn" class="account-btn" style="display: none; border-color: #ff6b00;" onclick="window.openAdminModal()">
                     Admin Pending (<span id="pending-count">0</span>)
                 </button>
-                <button class="account-btn" onclick="handleAccountClick()">
+                <button class="account-btn" onclick="window.handleAccountClick()">
                     <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23888888'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/></svg>" id="header-avatar" class="avatar-img" alt="Avatar">
                     <span id="header-username">Log In / Register</span>
                 </button>
@@ -107,7 +107,7 @@
             <h2 class="modal-title" id="auth-title">Log In</h2>
             <div class="error-message" id="auth-error"></div>
             
-            <form id="auth-form" onsubmit="handleAuthSubmit(event)">
+            <form id="auth-form" onsubmit="window.handleAuthSubmit(event)">
                 <div class="form-group" id="username-group" style="display: none;">
                     <label for="auth-username">Ingame Username</label>
                     <input type="text" id="auth-username" placeholder="e.g. qChrc">
@@ -126,8 +126,8 @@
                 </div>
 
                 <button type="submit" class="btn-primary" id="auth-submit-btn">Log In</button>
-                <button type="button" class="btn-secondary" onclick="toggleAuthMode()" id="auth-toggle-btn">Need an account? Register</button>
-                <button type="button" class="btn-secondary" onclick="closeAuthModal()" style="margin-top: 5px;">Cancel</button>
+                <button type="button" class="btn-secondary" onclick="window.toggleAuthMode()" id="auth-toggle-btn">Need an account? Register</button>
+                <button type="button" class="btn-secondary" onclick="window.closeAuthModal()" style="margin-top: 5px;">Cancel</button>
             </form>
         </div>
     </div>
@@ -137,7 +137,7 @@
         <div class="modal-content">
             <h2 class="modal-title">Submit Level / Record</h2>
             <div class="error-message" id="submit-error"></div>
-            <form id="submit-form" onsubmit="handleFormSubmission(event)">
+            <form id="submit-form" onsubmit="window.handleFormSubmission(event)">
                 <div class="form-group">
                     <label for="sub-player">Ingame Username</label>
                     <input type="text" id="sub-player" required placeholder="e.g. qChrc">
@@ -174,7 +174,7 @@
                 </div>
 
                 <button type="submit" class="btn-primary">Submit</button>
-                <button type="button" class="btn-secondary" onclick="closeSubmitModal()">Cancel</button>
+                <button type="button" class="btn-secondary" onclick="window.closeSubmitModal()">Cancel</button>
             </form>
         </div>
     </div>
@@ -183,7 +183,7 @@
     <div class="modal" id="edit-modal">
         <div class="modal-content">
             <h2 class="modal-title">Edit Level</h2>
-            <form id="edit-form" onsubmit="handleLevelEditSubmit(event)">
+            <form id="edit-form" onsubmit="window.handleLevelEditSubmit(event)">
                 <input type="hidden" id="edit-index">
                 <div class="form-group">
                     <label for="edit-rank">Platzierung (Rang)</label>
@@ -233,7 +233,7 @@
                 </div>
 
                 <button type="submit" class="btn-primary">Save Changes</button>
-                <button type="button" class="btn-secondary" onclick="closeEditModal()">Cancel</button>
+                <button type="button" class="btn-secondary" onclick="window.closeEditModal()">Cancel</button>
             </form>
         </div>
     </div>
@@ -242,7 +242,7 @@
     <div class="modal" id="edit-player-modal">
         <div class="modal-content">
             <h2 class="modal-title">Edit Player</h2>
-            <form id="edit-player-form" onsubmit="handlePlayerEditSubmit(event)">
+            <form id="edit-player-form" onsubmit="window.handlePlayerEditSubmit(event)">
                 <input type="hidden" id="edit-player-index">
                 <div class="form-group">
                     <label for="edit-player-name">Player Name</label>
@@ -262,7 +262,7 @@
                 </div>
 
                 <button type="submit" class="btn-primary">Save Player Changes</button>
-                <button type="button" class="btn-secondary" onclick="closeEditPlayerModal()">Cancel</button>
+                <button type="button" class="btn-secondary" onclick="window.closeEditPlayerModal()">Cancel</button>
             </form>
         </div>
     </div>
@@ -274,7 +274,7 @@
             <div id="admin-submissions-list">
                 <p style="color: #888;">No pending submissions.</p>
             </div>
-            <button type="button" class="btn-secondary" onclick="closeAdminModal()" style="margin-top: 15px;">Close</button>
+            <button type="button" class="btn-secondary" onclick="window.closeAdminModal()" style="margin-top: 15px;">Close</button>
         </div>
     </div>
 
@@ -327,7 +327,8 @@
 
         const OWNER_NAME = "qchrc"; 
 
-        // Initialdaten mit DEINEN echten Leveln und Spielern
+        window.currentTab = "classic";
+
         let demons = [
             { rank: 1, name: "Tung Tung Tung Sahurcles", difficulty: "Extreme Demon", difficultyIcon: "extreme.jpg", publisher: "ArraegenGD", creator: "ArraegenGD", myVerifier: "Derlery5", originalVerifier: "Nova4664", victors: ["Player1", "Player2"], youtubeId: "JCAOQQu4Iy0", description: "Tripple T" },
             { rank: 2, name: "Cataclysm", difficulty: "Extreme Demon", difficultyIcon: "extreme.jpg", publisher: "Ggb0y", creator: "Ggb0y", myVerifier: "Derlery5", originalVerifier: "Riot", victors: ["Player1", "Player2"], youtubeId: "Kd-G_pd3OPw", description: "~6200 Attempts." },
@@ -353,7 +354,6 @@
             { placement: 4, name: "Ihia", currentHardest: "Shiver", points: 1, beatenExtremes: [] }
         ];
 
-        // --- Firebase Firestore Daten-Synchronisation ---
         async function loadDataFromFirestore() {
             try {
                 const demonsDoc = await getDoc(doc(db, "listdata", "demons"));
@@ -363,7 +363,6 @@
                     demons = demonsDoc.data().items || [];
                     players = playersDoc.data().items || [];
                 } else {
-                    // Falls noch keine Daten in Firestore liegen, echte Initialdaten hochladen
                     await saveDataToFirestore();
                 }
                 loadLevelList();
@@ -485,7 +484,6 @@
             }
         }
 
-        /* --- Owner Admin-Beförderungs-System --- */
         window.promoteToAdmin = async function() {
             if (!isUserOwner()) return;
             const targetUsername = document.getElementById("admin-promote-input").value.trim();
@@ -539,7 +537,6 @@
             }
         };
 
-        /* --- Level Bearbeiten (Edit) System --- */
         window.openEditModal = function(index) {
             if (!isUserAdmin()) return;
             const demon = demons[index];
@@ -607,12 +604,11 @@
             demons.forEach((d, i) => d.rank = i + 1);
 
             await saveDataToFirestore();
-            closeEditModal();
+            window.closeEditModal();
             loadLevelList();
             selectLevel(newRank - 1);
         };
 
-        /* --- Spieler Bearbeiten (Edit Player) System --- */
         window.openEditPlayerModal = function(index) {
             if (!isUserAdmin()) return;
             const player = players[index];
@@ -653,23 +649,20 @@
                 beatenExtremes: extremesArray
             };
 
-            // Rangliste nach Punkten sortieren & Plätze vergeben
             players.sort((a, b) => b.points - a.points);
             players.forEach((p, i) => p.placement = i + 1);
 
             await saveDataToFirestore();
-            closeEditPlayerModal();
+            window.closeEditPlayerModal();
             loadLevelList();
             
-            // Auf den bearbeiteten Spieler fokussieren
             const updatedIndex = players.findIndex(p => p.name === updatedName);
             selectLevel(updatedIndex >= 0 ? updatedIndex : 0);
         };
 
-        /* Modal Submissions Functions */
         window.openSubmitModal = function() {
             if (!auth.currentUser) {
-                openAuthModal();
+                window.openAuthModal();
                 return;
             }
             if (currentUserData && currentUserData.username) {
@@ -699,7 +692,7 @@
                     submittedAt: new Date().toISOString()
                 });
                 alert("Submission successful! Waiting for approval.");
-                closeSubmitModal();
+                window.closeSubmitModal();
                 if (isUserAdmin()) loadPendingSubmissions();
             } catch (err) {
                 const errEl = document.getElementById("submit-error");
@@ -708,7 +701,6 @@
             }
         };
 
-        /* Admin Approval System */
         window.openAdminModal = async function() {
             await loadPendingSubmissions();
             const container = document.getElementById("admin-submissions-list");
@@ -728,8 +720,8 @@
                         <div style="margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
                             <label style="font-size: 11px;">Platzierung (Rang):</label>
                             <input type="number" id="rank-input-${idx}" min="1" max="${demons.length + 1}" value="1" style="width: 60px; padding: 4px; background: #1a1b23; border: 1px solid #2a2c3a; color: white; border-radius: 4px;">
-                            <button class="btn-primary" style="width: auto; padding: 4px 10px; margin:0;" onclick="approveSubmission('${sub.id}', ${idx})">Approve</button>
-                            <button class="btn-secondary" style="width: auto; padding: 4px 10px; margin:0; color: #ff4d4d; border-color: #ff4d4d;" onclick="rejectSubmission('${sub.id}')">Reject</button>
+                            <button class="btn-primary" style="width: auto; padding: 4px 10px; margin:0;" onclick="window.approveSubmission('${sub.id}', ${idx})">Approve</button>
+                            <button class="btn-secondary" style="width: auto; padding: 4px 10px; margin:0; color: #ff4d4d; border-color: #ff4d4d;" onclick="window.rejectSubmission('${sub.id}')">Reject</button>
                         </div>
                     `;
                     container.appendChild(card);
@@ -746,7 +738,7 @@
         window.rejectSubmission = async function(docId) {
             try {
                 await deleteDoc(doc(db, "submissions", docId));
-                openAdminModal();
+                window.openAdminModal();
             } catch (e) {
                 alert("Error deleting submission: " + e.message);
             }
@@ -841,21 +833,21 @@
             await saveDataToFirestore();
 
             loadLevelList();
-            openAdminModal();
+            window.openAdminModal();
         };
 
         window.handleAccountClick = function() {
             if (auth.currentUser) {
-                switchTab('profile');
+                window.switchTab('profile');
             } else {
-                openAuthModal();
+                window.openAuthModal();
             }
         };
 
-        function openAuthModal() {
+        window.openAuthModal = function() {
             document.getElementById("auth-modal").classList.add("active");
             document.getElementById("auth-error").style.display = "none";
-        }
+        };
 
         window.closeAuthModal = function() {
             document.getElementById("auth-modal").classList.remove("active");
@@ -900,7 +892,7 @@
                     await signInWithEmailAndPassword(auth, email, password);
                 }
 
-                closeAuthModal();
+                window.closeAuthModal();
             } catch (error) {
                 errorElement.textContent = error.message;
                 errorElement.style.display = "block";
@@ -909,7 +901,7 @@
 
         window.handleLogout = async function() {
             await signOut(auth);
-            switchTab('classic');
+            window.switchTab('classic');
         };
 
         window.updateAvatarUrl = async function() {
@@ -925,8 +917,6 @@
                 }
             }
         };
-
-        window.currentTab = "classic";
 
         window.switchTab = function(tab) {
             window.currentTab = tab;
@@ -981,15 +971,15 @@
                         <h3 style="color: #ff6b00; margin-bottom: 10px;">Owner Panel: Admin Management</h3>
                         <div style="display: flex; gap: 10px; align-items: center;">
                             <input type="text" id="admin-promote-input" placeholder="Ingame Username" style="padding: 8px; background: #121318; border: 1px solid #2a2c3a; color: white; border-radius: 6px; flex-grow: 1;">
-                            <button class="btn-primary" style="width: auto; margin: 0;" onclick="promoteToAdmin()">Make Admin</button>
-                            <button class="btn-secondary" style="width: auto; margin: 0; color: #ff4d4d; border-color: #ff4d4d;" onclick="demoteAdmin()">Remove Admin</button>
+                            <button class="btn-primary" style="width: auto; margin: 0;" onclick="window.promoteToAdmin()">Make Admin</button>
+                            <button class="btn-secondary" style="width: auto; margin: 0; color: #ff4d4d; border-color: #ff4d4d;" onclick="window.demoteAdmin()">Remove Admin</button>
                         </div>
                     </div>
                 ` : '';
 
                 detailsContainer.innerHTML = `
                     <div style="margin-bottom: 15px;">
-                        <button class="btn-secondary" style="width: auto; padding: 6px 12px; font-size: 13px;" onclick="switchTab('classic')">← Back to List</button>
+                        <button class="btn-secondary" style="width: auto; padding: 6px 12px; font-size: 13px;" onclick="window.switchTab('classic')">← Back to List</button>
                     </div>
 
                     <img src="${currentUserData?.avatarUrl || DEFAULT_AVATAR}" class="profile-avatar-large" alt="Avatar">
@@ -997,7 +987,7 @@
                     <p class="description" style="text-align: center;">My Profile ${isUserAdmin() ? '(Admin/Owner)' : ''}</p>
 
                     <div style="text-align: center; margin-bottom: 20px;">
-                        <button class="btn-primary" style="width: auto; padding: 6px 15px; font-size: 13px;" onclick="updateAvatarUrl()">Change Profile Picture</button>
+                        <button class="btn-primary" style="width: auto; padding: 6px 15px; font-size: 13px;" onclick="window.updateAvatarUrl()">Change Profile Picture</button>
                     </div>
 
                     <div class="info-card" style="margin: 0 auto;">
@@ -1022,13 +1012,13 @@
                     ${ownerPanelHTML}
 
                     <div style="text-align: center; margin-top: 25px;">
-                        <button class="btn-secondary" style="width: auto; padding: 8px 20px; color: #ff4d4d; border-color: #ff4d4d;" onclick="handleLogout()">Log Out</button>
+                        <button class="btn-secondary" style="width: auto; padding: 8px 20px; color: #ff4d4d; border-color: #ff4d4d;" onclick="window.handleLogout()">Log Out</button>
                     </div>
                 `;
             } else if (window.currentTab === "classic") {
                 const demon = demons[index];
                 if (!demon) return;
-                const editButtonHTML = isUserAdmin() ? `<button class="btn-edit" onclick="openEditModal(${index})">✏️ Edit Level</button>` : '';
+                const editButtonHTML = isUserAdmin() ? `<button class="btn-edit" onclick="window.openEditModal(${index})">✏️ Edit Level</button>` : '';
 
                 detailsContainer.innerHTML = `
                     <div class="level-title-container">
@@ -1074,7 +1064,7 @@
             } else {
                 const player = players[index];
                 if (!player) return;
-                const editPlayerButtonHTML = isUserAdmin() ? `<button class="btn-edit" onclick="openEditPlayerModal(${index})">✏️ Edit Player</button>` : '';
+                const editPlayerButtonHTML = isUserAdmin() ? `<button class="btn-edit" onclick="window.openEditPlayerModal(${index})">✏️ Edit Player</button>` : '';
 
                 detailsContainer.innerHTML = `
                     <div class="level-title-container">
