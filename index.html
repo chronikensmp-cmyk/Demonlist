@@ -292,7 +292,7 @@
         let isRegisterMode = false;
         let pendingSubmissions = [];
 
-        const OWNER_NAME = "qChrc"; // Der Owner der Demonlist
+        const OWNER_NAME = "qchrc"; 
 
         const baseValues = {
             "Easy Demon": 1,
@@ -330,12 +330,15 @@
         function isUserAdmin() {
             if (!currentUserData) return false;
             const name = (currentUserData.username || "").toLowerCase();
-            return name === OWNER_NAME || currentUserData.role === "admin";
+            const role = (currentUserData.role || "").toLowerCase();
+            return name === OWNER_NAME || role === "admin" || role === "owner";
         }
 
         function isUserOwner() {
             if (!currentUserData) return false;
-            return (currentUserData.username || "").toLowerCase() === OWNER_NAME;
+            const name = (currentUserData.username || "").toLowerCase();
+            const role = (currentUserData.role || "").toLowerCase();
+            return name === OWNER_NAME || role === "owner";
         }
 
         onAuthStateChanged(auth, async (user) => {
@@ -470,8 +473,13 @@
             document.getElementById("edit-modal").classList.remove("active");
         };
 
-        window.handleLevelEditSubmit = function(e) {
+        window.handleLevelEditSubmit = async function(e) {
             e.preventDefault();
+            if (!isUserAdmin()) {
+                alert("Keine Berechtigung!");
+                return;
+            }
+
             const index = parseInt(document.getElementById("edit-index").value);
             const newRank = parseInt(document.getElementById("edit-rank").value);
 
@@ -483,7 +491,6 @@
 
             const autoTier = getTierByRank(diff, newRank);
 
-            // Objekt aktualisieren
             const updatedDemon = {
                 ...demons[index],
                 rank: newRank,
@@ -499,12 +506,8 @@
                 tier: autoTier
             };
 
-            // Aus altem Array entfernen
             demons.splice(index, 1);
-            // An neuem Rang einsortieren
             demons.splice(newRank - 1, 0, updatedDemon);
-
-            // Ränge neu zuweisen
             demons.forEach((d, i) => d.rank = i + 1);
 
             closeEditModal();
@@ -703,10 +706,12 @@
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                     const user = userCredential.user;
 
+                    const isOwner = username.toLowerCase() === OWNER_NAME;
+
                     await setDoc(doc(db, "users", user.uid), {
                         username: username,
                         avatarUrl: DEFAULT_AVATAR,
-                        role: username.toLowerCase() === OWNER_NAME ? "owner" : "user",
+                        role: isOwner ? "owner" : "user",
                         createdAt: new Date().toISOString()
                     });
                 } else {
@@ -832,7 +837,7 @@
 
                     <img src="${currentUserData?.avatarUrl || DEFAULT_AVATAR}" class="profile-avatar-large" alt="Avatar">
                     <h1 class="level-title" style="text-align: center;">${username}</h1>
-                    <p class="description" style="text-align: center;">My Profile ${isUserAdmin() ? '(Admin)' : ''}</p>
+                    <p class="description" style="text-align: center;">My Profile ${isUserAdmin() ? '(Admin/Owner)' : ''}</p>
 
                     <div style="text-align: center; margin-bottom: 20px;">
                         <button class="btn-primary" style="width: auto; padding: 6px 15px; font-size: 13px;" onclick="updateAvatarUrl()">Change Profile Picture</button>
@@ -896,7 +901,7 @@
                         </div>
                         <div class="info-row">
                             <span class="info-label">Verifier:</span>
-                            <span class="info-value ${demon.myVerifier === 'qChrc' ? 'highlight-name' : ''}">${demon.myVerifier}</span>
+                            <span class="info-value ${demon.myVerifier.toLowerCase() === 'qchrc' ? 'highlight-name' : ''}">${demon.myVerifier}</span>
                         </div>
                         <div class="info-row">
                             <span class="info-label">Original Verifier:</span>
