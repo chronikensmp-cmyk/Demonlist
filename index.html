@@ -1,4 +1,462 @@
-<!-- Firebase Script -->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>German Demonlist</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: #121318;
+            color: #e0e0e0;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        @media (min-width: 600px) {
+            .app-container {
+                flex-direction: row;
+            }
+        }
+
+        /* Sidebar / Liste */
+        .sidebar {
+            width: 100%;
+            background-color: #1a1b23;
+            border-bottom: 1px solid #2a2c3a;
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            max-height: 40vh;
+        }
+
+        @media (min-width: 600px) {
+            .sidebar {
+                width: 340px;
+                max-height: 100vh;
+                border-right: 1px solid #2a2c3a;
+                border-bottom: none;
+            }
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+
+        .logo-highlight {
+            color: #ff6b00;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            background: none;
+            border: none;
+            color: #888;
+            border-bottom: 2px solid transparent;
+            padding: 5px 8px;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .tab.active {
+            color: #ff6b00;
+            border-bottom: 2px solid #ff6b00;
+        }
+
+        #search {
+            width: 100%;
+            padding: 8px 12px;
+            background-color: #121318;
+            border: 1px solid #2a2c3a;
+            border-radius: 6px;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .level-list {
+            list-style: none;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        .level-item {
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            background-color: #21232e;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .level-item.active {
+            background-color: #ff6b00;
+            color: white;
+        }
+
+        .rank {
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        /* Main Layout Header & Content */
+        .main-wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .top-header {
+            background-color: #1a1b23;
+            border-bottom: 1px solid #2a2c3a;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .account-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background-color: #21232e;
+            border: 1px solid #2a2c3a;
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            color: #fff;
+            font-weight: bold;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+
+        .account-btn:hover {
+            background-color: #2a2c3a;
+        }
+
+        .avatar-img {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            object-fit: cover;
+            background-color: #2a2c3a;
+        }
+
+        /* Contentbereich */
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .level-title {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .description {
+            color: #aaa;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-width: 650px;
+            aspect-ratio: 16 / 9;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .video-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .info-card {
+            background-color: #1a1b23;
+            padding: 15px;
+            border-radius: 8px;
+            max-width: 650px;
+            border: 1px solid #2a2c3a;
+            margin-bottom: 15px;
+        }
+
+        .info-row {
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #2a2c3a;
+            padding-bottom: 6px;
+            font-size: 14px;
+        }
+
+        .info-label {
+            color: #888;
+            font-weight: bold;
+        }
+
+        .info-value {
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .difficulty-icon {
+            height: 24px;
+            width: auto;
+        }
+
+        .highlight-name {
+            color: #ff6b00;
+            font-weight: bold;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: #1a1b23;
+            border: 1px solid #2a2c3a;
+            border-radius: 8px;
+            padding: 25px;
+            width: 90%;
+            max-width: 450px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-title {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 4px;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            background-color: #121318;
+            border: 1px solid #2a2c3a;
+            border-radius: 6px;
+            color: #fff;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            color: #aaa;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 10px;
+            background-color: #ff6b00;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        .btn-secondary {
+            width: 100%;
+            padding: 8px;
+            background-color: transparent;
+            border: 1px solid #2a2c3a;
+            border-radius: 6px;
+            color: #888;
+            cursor: pointer;
+        }
+
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-success {
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .error-message {
+            color: #ff4d4d;
+            font-size: 12px;
+            margin-bottom: 10px;
+            display: none;
+        }
+
+        .profile-avatar-large {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 15px auto;
+            display: block;
+            border: 2px solid #ff6b00;
+            background-color: #2a2c3a;
+        }
+
+        .badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background-color: #ff6b00;
+            color: white;
+            margin-left: 5px;
+            text-transform: uppercase;
+        }
+
+        .badge-owner { background-color: #e74c3c; }
+        .badge-admin { background-color: #3498db; }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo" onclick="switchTab('classic')">
+                <span class="logo-highlight">German</span> Demonlist
+            </div>
+            <div class="tabs">
+                <button class="tab active" id="tab-classic" onclick="switchTab('classic')">CLASSIC</button>
+                <button class="tab" id="tab-players" onclick="switchTab('players')">PLAYERS</button>
+                <button class="tab" id="tab-submit" onclick="switchTab('submit')">SUBMIT</button>
+                <button class="tab" id="tab-pending" onclick="switchTab('pending')" style="display:none;">PENDING</button>
+            </div>
+            <input type="text" id="search" placeholder="Search..." onkeyup="filterLevels()">
+            <ul id="level-list" class="level-list"></ul>
+        </aside>
+
+        <!-- Main Wrapper -->
+        <div class="main-wrapper">
+            <header class="top-header">
+                <div>
+                    <span id="role-badge" class="badge" style="display:none;"></span>
+                </div>
+                <button class="account-btn" onclick="handleAccountClick()">
+                    <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23888888'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/></svg>" id="header-avatar" class="avatar-img" alt="Avatar">
+                    <span id="header-username">Log In / Register</span>
+                </button>
+            </header>
+
+            <main class="content">
+                <div id="level-details"></div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div class="modal" id="auth-modal">
+        <div class="modal-content">
+            <h2 class="modal-title" id="auth-title">Log In</h2>
+            <div class="error-message" id="auth-error"></div>
+            
+            <form id="auth-form" onsubmit="handleAuthSubmit(event)">
+                <div class="form-group" id="username-group" style="display: none;">
+                    <label for="auth-username">Ingame Username</label>
+                    <input type="text" id="auth-username" placeholder="e.g. Derlery5">
+                </div>
+                <div class="form-group">
+                    <label for="auth-email">Email</label>
+                    <input type="email" id="auth-email" required placeholder="name@example.com">
+                </div>
+                <div class="form-group">
+                    <label for="auth-password">Password</label>
+                    <input type="password" id="auth-password" required placeholder="••••••••">
+                </div>
+                <div class="checkbox-group" id="remember-group">
+                    <input type="checkbox" id="auth-remember" checked>
+                    <label for="auth-remember">Angemeldet bleiben</label>
+                </div>
+
+                <button type="submit" class="btn-primary" id="auth-submit-btn">Log In</button>
+                <button type="button" class="btn-secondary" onclick="toggleAuthMode()" id="auth-toggle-btn">Need an account? Register</button>
+                <button type="button" class="btn-secondary" onclick="closeAuthModal()" style="margin-top: 5px;">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit/Manage Modal -->
+    <div class="modal" id="edit-modal">
+        <div class="modal-content">
+            <h2 class="modal-title" id="edit-modal-title">Edit Item</h2>
+            <div id="edit-form-container"></div>
+            <button type="button" class="btn-secondary" onclick="closeEditModal()">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Firebase Script -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { 
@@ -20,7 +478,8 @@
             collection,
             addDoc,
             deleteDoc,
-            updateDoc
+            updateDoc,
+            onSnapshot
         } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         // Fallback Initial Data
@@ -211,7 +670,6 @@
             try {
                 await addDoc(collection(db, "submissions"), newSub);
                 alert("Einreichung erfolgreich abgesendet! Admins werden dein Level prüfen.");
-                await loadAllDataOnce();
                 switchTab("classic");
             } catch (err) {
                 alert("Fehler beim Einreichen: " + err.message);
@@ -267,7 +725,6 @@
             await deleteDoc(doc(db, "submissions", subId));
 
             alert("Level erfolgreich akzeptiert und eingeordnet!");
-            await loadAllDataOnce();
             switchTab("classic");
         };
 
@@ -275,7 +732,6 @@
             if (confirm("Möchtest du diese Einreichung wirklich ablehnen?")) {
                 await deleteDoc(doc(db, "submissions", subId));
                 alert("Einreichung abgelehnt.");
-                await loadAllDataOnce();
                 switchTab("pending");
             }
         };
@@ -348,8 +804,6 @@
 
             await saveDemonsToDb();
             window.closeEditModal();
-            recalculatePlayerScores();
-            loadLevelList();
         };
 
         window.deleteDemon = async function(index) {
@@ -359,8 +813,6 @@
                 demons.forEach((d, i) => d.rank = i + 1);
                 await saveDemonsToDb();
                 window.closeEditModal();
-                recalculatePlayerScores();
-                loadLevelList();
             }
         };
 
@@ -381,8 +833,6 @@
             players[index].name = document.getElementById("edit-p-name").value.trim();
             await savePlayersToDb();
             window.closeEditModal();
-            recalculatePlayerScores();
-            loadLevelList();
         };
 
         window.deletePlayer = async function(index) {
@@ -390,8 +840,6 @@
                 players.splice(index, 1);
                 await savePlayersToDb();
                 window.closeEditModal();
-                recalculatePlayerScores();
-                loadLevelList();
             }
         };
 
@@ -466,39 +914,34 @@
             }
         }
 
-        // EINMALIGES LADEN STATT LIVE-LISTENERN (Keine Schleifen mehr möglich)
-        async function loadAllDataOnce() {
-            try {
-                // Demons laden
-                const demonSnap = await getDoc(doc(db, "listdata", "demons"));
-                if (demonSnap.exists() && demonSnap.data().list) {
-                    demons = demonSnap.data().list;
+        function initFirestoreListeners() {
+            onSnapshot(doc(db, "listdata", "demons"), (snapshot) => {
+                if (snapshot.exists() && snapshot.data().list) {
+                    demons = snapshot.data().list;
                 } else {
                     demons = initialDemons;
-                    await saveDemonsToDb();
                 }
-
-                // Players laden
-                const playerSnap = await getDoc(doc(db, "listdata", "players"));
-                if (playerSnap.exists() && playerSnap.data().list) {
-                    players = playerSnap.data().list;
-                } else {
-                    players = initialPlayers;
-                    await savePlayersToDb();
-                }
-
-                // Submissions laden
-                const subSnap = await getDocs(collection(db, "submissions"));
-                submissions = [];
-                subSnap.forEach((doc) => {
-                    submissions.push({ id: doc.id, ...doc.data() });
-                });
-
                 recalculatePlayerScores();
                 loadLevelList();
-            } catch (err) {
-                console.error("Fehler beim einmaligen Laden der Daten:", err);
-            }
+            });
+
+            onSnapshot(doc(db, "listdata", "players"), (snapshot) => {
+                if (snapshot.exists() && snapshot.data().list) {
+                    players = snapshot.data().list;
+                } else {
+                    players = initialPlayers;
+                }
+                recalculatePlayerScores();
+                loadLevelList();
+            });
+
+            onSnapshot(collection(db, "submissions"), (snapshot) => {
+                submissions = [];
+                snapshot.forEach((doc) => {
+                    submissions.push({ id: doc.id, ...doc.data() });
+                });
+                if (window.currentTab === "pending") loadLevelList();
+            });
         }
 
         async function saveDemonsToDb() {
@@ -549,6 +992,7 @@
 
         function loadLevelList() {
             const listElement = document.getElementById("level-list");
+            if (!listElement) return;
             listElement.innerHTML = "";
 
             if (window.currentTab === "profile" || window.currentTab === "submit") {
@@ -592,6 +1036,7 @@
             });
 
             const detailsContainer = document.getElementById("level-details");
+            if (!detailsContainer) return;
 
             if (window.currentTab === "profile") {
                 renderProfileView(detailsContainer);
@@ -839,8 +1284,8 @@
             `;
         }
 
-        // System Start - Daten genau 1x beim Laden abrufen
-        loadAllDataOnce();
+        // System Start
+        initFirestoreListeners();
     </script>
 </body>
 </html>
