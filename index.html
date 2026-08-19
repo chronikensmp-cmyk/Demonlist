@@ -190,6 +190,21 @@
                     <input type="number" id="edit-rank" min="1" required>
                 </div>
                 <div class="form-group">
+                    <label for="edit-tier">Tier (1-10)</label>
+                    <select id="edit-tier">
+                        <option value="1">1 (x1.0)</option>
+                        <option value="2">2 (x1.2)</option>
+                        <option value="3">3 (x1.4)</option>
+                        <option value="4">4 (x1.6)</option>
+                        <option value="5">5 (x1.8)</option>
+                        <option value="6">6 (x2.0)</option>
+                        <option value="7">7 (x2.3)</option>
+                        <option value="8">8 (x2.6)</option>
+                        <option value="9">9 (x3.0)</option>
+                        <option value="10">10 (x3.5)</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <label for="edit-name">Level Name</label>
                     <input type="text" id="edit-name" required>
                 </div>
@@ -329,22 +344,50 @@
 
         window.currentTab = "classic";
 
+        // Tabellen für Punkteberechnung (Tier-System)
+        const baseValues = {
+            "Easy Demon": 1,
+            "Medium Demon": 2,
+            "Hard Demon": 3,
+            "Insane Demon": 5,
+            "Extreme Demon": 10
+        };
+
+        const tierMultipliers = {
+            1: 1.0,
+            2: 1.2,
+            3: 1.4,
+            4: 1.6,
+            5: 1.8,
+            6: 2.0,
+            7: 2.3,
+            8: 2.6,
+            9: 3.0,
+            10: 3.5
+        };
+
+        function calculatePoints(difficulty, tier) {
+            const base = baseValues[difficulty] || 1;
+            const mult = tierMultipliers[tier] || 1.0;
+            return Math.round((base * mult) * 10) / 10;
+        }
+
         let demons = [
-            { rank: 1, name: "Tung Tung Tung Sahurcles", difficulty: "Extreme Demon", difficultyIcon: "extreme.jpg", publisher: "ArraegenGD", creator: "ArraegenGD", myVerifier: "Derlery5", originalVerifier: "Nova4664", victors: ["Player1", "Player2"], youtubeId: "JCAOQQu4Iy0", description: "Tripple T" },
-            { rank: 2, name: "Cataclysm", difficulty: "Extreme Demon", difficultyIcon: "extreme.jpg", publisher: "Ggb0y", creator: "Ggb0y", myVerifier: "Derlery5", originalVerifier: "Riot", victors: ["Player1", "Player2"], youtubeId: "Kd-G_pd3OPw", description: "~6200 Attempts." },
-            { rank: 3, name: "Sweather Weather", difficulty: "Extreme Demon", difficultyIcon: "extreme.jpg", publisher: "VelYT", creator: "VelYT", myVerifier: "Limbu", originalVerifier: "Xfire", victors: ["Player 1"], youtubeId: "7CZFG9oisPI", description: "Deep Level" },
-            { rank: 4, name: "ACU", difficulty: "Extreme Demon", difficultyIcon: "extreme.jpg", publisher: "neigefeu", creator: "neigefeu", myVerifier: "Derlery5", originalVerifier: "neigefeu", victors: ["Limbu"], youtubeId: "riMBe0u4FpU", description: "Einfachster Extreme." },
-            { rank: 5, name: "Poltergeist", difficulty: "Insane Demon", difficultyIcon: "insane.png", publisher: "Andromeda", creator: "Andromeda", myVerifier: "Derlery5", originalVerifier: "Andromeda", victors: ["Player1"], youtubeId: "uUP6l68Tsg0", description: "Cooles Level" },
-            { rank: 6, name: "Sonic Wave Universe", difficulty: "Insane Demon", difficultyIcon: "insane.png", publisher: "HuyChoiGeoDat", creator: "HuyChoiGeoDat", myVerifier: "Derlery5", originalVerifier: "HuyChoiGeoDat", victors: ["Player1"], youtubeId: "i4fROh81T6U", description: "Cooles sw Level" },
-            { rank: 7, name: "Inane Demon", difficulty: "Insane Demon", difficultyIcon: "insane.png", publisher: "KiwiPenguin", creator: "KiwiPenguin", myVerifier: "Derlery5", originalVerifier: "KiwiPenguin", victors: ["Player1"], youtubeId: "OjRwvdtjuqE", description: "Funny April Joke" },
-            { rank: 8, name: "Stalemate", difficulty: "Insane Demon", difficultyIcon: "insane.png", publisher: "Nox", creator: "Nox", myVerifier: "Derlery5", originalVerifier: "Nox", victors: ["Player1"], youtubeId: "h0ePMjhnUNI", description: "1.9" },
-            { rank: 9, name: "Windy Landscape", difficulty: "Insane Demon", difficultyIcon: "insane.png", publisher: "WOOGI1411", creator: "WOOGI1411", myVerifier: "Derlery5", originalVerifier: "GuitarHeroStyles", victors: ["Player1"], youtubeId: "UWUmUDGY31k", description: "Ikonisch" },
-            { rank: 10, name: "CraZy", difficulty: "Insane Demon", difficultyIcon: "insane.png", publisher: "DavJT", creator: "DavJT", myVerifier: "Derlery5", originalVerifier: "DavJT", victors: ["Player1"], youtubeId: "InQNiq9IKxA", description: "Tuff" },
-            { rank: 11, name: "CraZy II", difficulty: "Insane Demon", difficultyIcon: "insane.png", publisher: "DavJT", creator: "DavJT & N R G", myVerifier: "Derlery5", originalVerifier: "DavJT", victors: ["Player1"], youtubeId: "A1YYMgkAzWI", description: "Tuff II" },
-            { rank: 12, name: "Mechanical Showdown", difficulty: "Medium Demon", difficultyIcon: "medium.webp", publisher: "Tongii", creator: "Tongii", myVerifier: "Derlery5", originalVerifier: "Tongii", victors: ["Player1"], youtubeId: "TlxSOw8PyVs", description: "Mechanical" },
-            { rank: 13, name: "Skelletal Shenanigans", difficulty: "Medium Demon", difficultyIcon: "medium.webp", publisher: "YoReid", creator: "YoReid & Airzyy", myVerifier: "qChrc", originalVerifier: "YoReid", victors: ["Derlery5"], youtubeId: "-hU6A5kby0I", description: "New Hardest" },
-            { rank: 14, name: "KATAMARI", difficulty: "Medium Demon", difficultyIcon: "medium.webp", publisher: "MonkeyInABowl", creator: "MonkeyInABowl", myVerifier: "Derlery5", originalVerifier: "MonkeyInABowl", victors: ["Player1"], youtubeId: "XD-wZE7MMKE", description: "Bruh" },
-            { rank: 15, name: "Shiver", difficulty: "Easy Demon", difficultyIcon: "easy.webp", publisher: "SpKale", creator: "SpKale", myVerifier: "Ihia", originalVerifier: "SpKale", victors: ["Player1"], youtubeId: "hRJR3zGCmhE", description: "Erster EZ Demon" }
+            { rank: 1, name: "Tung Tung Tung Sahurcles", difficulty: "Extreme Demon", difficultyIcon: "extreme.jpg", publisher: "ArraegenGD", creator: "ArraegenGD", myVerifier: "Derlery5", originalVerifier: "Nova4664", victors: ["Player1", "Player2"], youtubeId: "JCAOQQu4Iy0", description: "Tripple T", tier: 10 },
+            { rank: 2, name: "Cataclysm", difficulty: "Extreme Demon", difficultyIcon: "extreme.jpg", publisher: "Ggb0y", creator: "Ggb0y", myVerifier: "Derlery5", originalVerifier: "Riot", victors: ["Player1", "Player2"], youtubeId: "Kd-G_pd3OPw", description: "~6200 Attempts.", tier: 8 },
+            { rank: 3, name: "Sweather Weather", difficulty: "Extreme Demon", difficultyIcon: "extreme.jpg", publisher: "VelYT", creator: "VelYT", myVerifier: "Limbu", originalVerifier: "Xfire", victors: ["Player 1"], youtubeId: "7CZFG9oisPI", description: "Deep Level", tier: 7 },
+            { rank: 4, name: "ACU", difficulty: "Extreme Demon", difficultyIcon: "extreme.jpg", publisher: "neigefeu", creator: "neigefeu", myVerifier: "Derlery5", originalVerifier: "neigefeu", victors: ["Limbu"], youtubeId: "riMBe0u4FpU", description: "Einfachster Extreme.", tier: 3 },
+            { rank: 5, name: "Poltergeist", difficulty: "Insane Demon", difficultyIcon: "insane.png", publisher: "Andromeda", creator: "Andromeda", myVerifier: "Derlery5", originalVerifier: "Andromeda", victors: ["Player1"], youtubeId: "uUP6l68Tsg0", description: "Cooles Level", tier: 7 },
+            { rank: 6, name: "Sonic Wave Universe", difficulty: "Insane Demon", difficultyIcon: "insane.png", publisher: "HuyChoiGeoDat", creator: "HuyChoiGeoDat", myVerifier: "Derlery5", originalVerifier: "HuyChoiGeoDat", victors: ["Player1"], youtubeId: "i4fROh81T6U", description: "Cooles sw Level", tier: 6 },
+            { rank: 7, name: "Inane Demon", difficulty: "Insane Demon", difficultyIcon: "insane.png", publisher: "KiwiPenguin", creator: "KiwiPenguin", myVerifier: "Derlery5", originalVerifier: "KiwiPenguin", victors: ["Player1"], youtubeId: "OjRwvdtjuqE", description: "Funny April Joke", tier: 5 },
+            { rank: 8, name: "Stalemate", difficulty: "Insane Demon", difficultyIcon: "insane.png", publisher: "Nox", creator: "Nox", myVerifier: "Derlery5", originalVerifier: "Nox", victors: ["Player1"], youtubeId: "h0ePMjhnUNI", description: "1.9", tier: 4 },
+            { rank: 9, name: "Windy Landscape", difficulty: "Insane Demon", difficultyIcon: "insane.png", publisher: "WOOGI1411", creator: "WOOGI1411", myVerifier: "Derlery5", originalVerifier: "GuitarHeroStyles", victors: ["Player1"], youtubeId: "UWUmUDGY31k", description: "Ikonisch", tier: 3 },
+            { rank: 10, name: "CraZy", difficulty: "Insane Demon", difficultyIcon: "insane.png", publisher: "DavJT", creator: "DavJT", myVerifier: "Derlery5", originalVerifier: "DavJT", victors: ["Player1"], youtubeId: "InQNiq9IKxA", description: "Tuff", tier: 2 },
+            { rank: 11, name: "CraZy II", difficulty: "Insane Demon", difficultyIcon: "insane.png", publisher: "DavJT", creator: "DavJT & N R G", myVerifier: "Derlery5", originalVerifier: "DavJT", victors: ["Player1"], youtubeId: "A1YYMgkAzWI", description: "Tuff II", tier: 4 },
+            { rank: 12, name: "Mechanical Showdown", difficulty: "Medium Demon", difficultyIcon: "medium.webp", publisher: "Tongii", creator: "Tongii", myVerifier: "Derlery5", originalVerifier: "Tongii", victors: ["Player1"], youtubeId: "TlxSOw8PyVs", description: "Mechanical", tier: 5 },
+            { rank: 13, name: "Skelletal Shenanigans", difficulty: "Medium Demon", difficultyIcon: "medium.webp", publisher: "YoReid", creator: "YoReid & Airzyy", myVerifier: "qChrc", originalVerifier: "YoReid", victors: ["Derlery5"], youtubeId: "-hU6A5kby0I", description: "New Hardest", tier: 3 },
+            { rank: 14, name: "KATAMARI", difficulty: "Medium Demon", difficultyIcon: "medium.webp", publisher: "MonkeyInABowl", creator: "MonkeyInABowl", myVerifier: "Derlery5", originalVerifier: "MonkeyInABowl", victors: ["Player1"], youtubeId: "XD-wZE7MMKE", description: "Bruh", tier: 2 },
+            { rank: 15, name: "Shiver", difficulty: "Easy Demon", difficultyIcon: "easy.webp", publisher: "SpKale", creator: "SpKale", myVerifier: "Ihia", originalVerifier: "SpKale", victors: ["Player1"], youtubeId: "hRJR3zGCmhE", description: "Erster EZ Demon", tier: 1 }
         ];
 
         let players = [
@@ -379,39 +422,6 @@
             } catch (e) {
                 console.error("Fehler beim Speichern in Firestore: ", e);
             }
-        }
-
-        const baseValues = {
-            "Easy Demon": 1,
-            "Medium Demon": 2,
-            "Hard Demon": 3,
-            "Insane Demon": 5,
-            "Extreme Demon": 10
-        };
-
-        const tierMultipliers = {
-            1: 1.0, 2: 1.2, 3: 1.4, 4: 1.6, 5: 1.8,
-            6: 2.0, 7: 2.3, 8: 2.6, 9: 3.0, 10: 3.5
-        };
-
-        function getTierByRank(difficulty, rank) {
-            if (difficulty === "Easy Demon") return 1;
-            if (difficulty === "Medium Demon") return 2;
-            if (difficulty === "Hard Demon") return 4;
-            if (difficulty === "Insane Demon") return 6;
-
-            if (rank <= 3) return 10;
-            if (rank <= 7) return 9;
-            if (rank <= 12) return 8;
-            if (rank <= 20) return 7;
-            if (rank <= 30) return 6;
-            return 5;
-        }
-
-        function calculatePoints(difficulty, tier) {
-            const base = baseValues[difficulty] || 1;
-            const mult = tierMultipliers[tier] || 1.0;
-            return Math.round((base * mult) * 10) / 10;
         }
 
         function isUserAdmin() {
@@ -542,6 +552,7 @@
             const demon = demons[index];
             document.getElementById("edit-index").value = index;
             document.getElementById("edit-rank").value = demon.rank;
+            document.getElementById("edit-tier").value = demon.tier || 1;
             document.getElementById("edit-name").value = demon.name;
             document.getElementById("edit-difficulty").value = demon.difficulty;
             document.getElementById("edit-publisher").value = demon.publisher;
@@ -568,14 +579,13 @@
 
             const index = parseInt(document.getElementById("edit-index").value);
             const newRank = parseInt(document.getElementById("edit-rank").value);
+            const newTier = parseInt(document.getElementById("edit-tier").value) || 1;
 
             let diffIcon = "easy.webp";
             const diff = document.getElementById("edit-difficulty").value;
             if (diff === "Medium Demon") diffIcon = "medium.webp";
             if (diff === "Insane Demon") diffIcon = "insane.png";
             if (diff === "Extreme Demon") diffIcon = "extreme.jpg";
-
-            const autoTier = getTierByRank(diff, newRank);
 
             const rawVictors = document.getElementById("edit-victors").value;
             const victorsArray = rawVictors
@@ -586,6 +596,7 @@
             const updatedDemon = {
                 ...demons[index],
                 rank: newRank,
+                tier: newTier,
                 name: document.getElementById("edit-name").value.trim(),
                 difficulty: diff,
                 difficultyIcon: diffIcon,
@@ -595,8 +606,7 @@
                 originalVerifier: document.getElementById("edit-orig-verifier").value.trim(),
                 victors: victorsArray,
                 youtubeId: document.getElementById("edit-youtube").value.trim(),
-                description: document.getElementById("edit-description").value.trim(),
-                tier: autoTier
+                description: document.getElementById("edit-description").value.trim()
             };
 
             demons.splice(index, 1);
@@ -718,8 +728,23 @@
                         <p><strong>Publisher/Creator:</strong> ${sub.publisher} / ${sub.creator}</p>
                         <p><strong>YouTube ID:</strong> ${sub.youtubeId}</p>
                         <div style="margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
-                            <label style="font-size: 11px;">Platzierung (Rang):</label>
-                            <input type="number" id="rank-input-${idx}" min="1" max="${demons.length + 1}" value="1" style="width: 60px; padding: 4px; background: #1a1b23; border: 1px solid #2a2c3a; color: white; border-radius: 4px;">
+                            <label style="font-size: 11px;">Rang:</label>
+                            <input type="number" id="rank-input-${idx}" min="1" max="${demons.length + 1}" value="1" style="width: 50px; padding: 4px; background: #1a1b23; border: 1px solid #2a2c3a; color: white; border-radius: 4px;">
+                            
+                            <label style="font-size: 11px;">Tier (1-10):</label>
+                            <select id="tier-input-${idx}" style="padding: 4px; background: #1a1b23; border: 1px solid #2a2c3a; color: white; border-radius: 4px;">
+                                <option value="1">1 (x1.0)</option>
+                                <option value="2">2 (x1.2)</option>
+                                <option value="3">3 (x1.4)</option>
+                                <option value="4">4 (x1.6)</option>
+                                <option value="5">5 (x1.8)</option>
+                                <option value="6">6 (x2.0)</option>
+                                <option value="7">7 (x2.3)</option>
+                                <option value="8">8 (x2.6)</option>
+                                <option value="9">9 (x3.0)</option>
+                                <option value="10">10 (x3.5)</option>
+                            </select>
+
                             <button class="btn-primary" style="width: auto; padding: 4px 10px; margin:0;" onclick="window.approveSubmission('${sub.id}', ${idx})">Approve</button>
                             <button class="btn-secondary" style="width: auto; padding: 4px 10px; margin:0; color: #ff4d4d; border-color: #ff4d4d;" onclick="window.rejectSubmission('${sub.id}')">Reject</button>
                         </div>
@@ -750,15 +775,20 @@
 
             const existingDemonIndex = demons.findIndex(d => d.name.toLowerCase() === sub.name.toLowerCase());
             
-            let autoTier;
-            let calculatedPoints;
-            let targetRank;
+            let selectedTier = parseInt(document.getElementById(`tier-input-${idx}`).value) || 1;
+            let targetRank = parseInt(document.getElementById(`rank-input-${idx}`).value) || 1;
+            let levelDifficulty = sub.difficulty;
+            let levelName = sub.name;
+            let calculatedPoints = 0;
 
             if (existingDemonIndex !== -1) {
                 const existingDemon = demons[existingDemonIndex];
                 targetRank = existingDemon.rank;
-                autoTier = getTierByRank(existingDemon.difficulty, existingDemon.rank);
-                calculatedPoints = calculatePoints(existingDemon.difficulty, autoTier);
+                levelDifficulty = existingDemon.difficulty;
+                levelName = existingDemon.name;
+                selectedTier = existingDemon.tier || selectedTier;
+
+                calculatedPoints = calculatePoints(levelDifficulty, selectedTier);
 
                 if (!existingDemon.victors) {
                     existingDemon.victors = [];
@@ -771,23 +801,19 @@
                     existingDemon.victors.push(sub.player);
                 }
 
-                alert(`Level "${existingDemon.name}" existiert bereits auf Rang #${targetRank}! ${sub.player} wurde zu den "Other Victors" hinzugefügt (${calculatedPoints} Pkt.).`);
+                alert(`Level "${levelName}" existiert bereits auf Rang #${targetRank}! ${sub.player} wurde zu den "Other Victors" hinzugefügt (+${calculatedPoints} Pkt.).`);
             } else {
-                const rankInput = document.getElementById(`rank-input-${idx}`).value;
-                targetRank = parseInt(rankInput) || 1;
-
-                autoTier = getTierByRank(sub.difficulty, targetRank);
-                calculatedPoints = calculatePoints(sub.difficulty, autoTier);
+                calculatedPoints = calculatePoints(levelDifficulty, selectedTier);
 
                 let diffIcon = "easy.webp";
-                if (sub.difficulty === "Medium Demon") diffIcon = "medium.webp";
-                if (sub.difficulty === "Insane Demon") diffIcon = "insane.png";
-                if (sub.difficulty === "Extreme Demon") diffIcon = "extreme.jpg";
+                if (levelDifficulty === "Medium Demon") diffIcon = "medium.webp";
+                if (levelDifficulty === "Insane Demon") diffIcon = "insane.png";
+                if (levelDifficulty === "Extreme Demon") diffIcon = "extreme.jpg";
 
                 const newDemon = {
                     rank: targetRank,
-                    name: sub.name,
-                    difficulty: sub.difficulty,
+                    name: levelName,
+                    difficulty: levelDifficulty,
                     difficultyIcon: diffIcon,
                     publisher: sub.publisher,
                     creator: sub.creator,
@@ -796,30 +822,28 @@
                     victors: [],
                     youtubeId: sub.youtubeId,
                     description: sub.description || "Community Submission",
-                    tier: autoTier
+                    tier: selectedTier
                 };
 
                 demons.splice(targetRank - 1, 0, newDemon);
                 demons.forEach((d, i) => d.rank = i + 1);
 
-                alert(`Neues Level "${sub.name}" als Platz #${targetRank} genehmigt! (Tier ${autoTier} | ${calculatedPoints} Pkt.)`);
+                alert(`Neues Level "${levelName}" auf Rang #${targetRank} genehmigt! (Tier ${selectedTier} | +${calculatedPoints} Pkt.)`);
             }
 
-            const levelDifficulty = existingDemonIndex !== -1 ? demons[existingDemonIndex].difficulty : sub.difficulty;
-            const levelName = existingDemonIndex !== -1 ? demons[existingDemonIndex].name : sub.name;
-
+            // Spieler aktualisieren oder neu erstellen
             let playerObj = players.find(p => p.name.toLowerCase() === sub.player.toLowerCase());
             if (!playerObj) {
                 playerObj = {
                     placement: players.length + 1,
                     name: sub.player,
                     currentHardest: levelName,
-                    points: calculatedPoints,
+                    points: Math.round(calculatedPoints * 10) / 10,
                     beatenExtremes: levelDifficulty === "Extreme Demon" ? [levelName] : []
                 };
                 players.push(playerObj);
             } else {
-                playerObj.points += calculatedPoints;
+                playerObj.points = Math.round((playerObj.points + calculatedPoints) * 10) / 10;
                 if (levelDifficulty === "Extreme Demon" && !playerObj.beatenExtremes.includes(levelName)) {
                     playerObj.beatenExtremes.push(levelName);
                 }
@@ -1036,7 +1060,7 @@
                             <span class="info-label">Difficulty:</span>
                             <span class="info-value">
                                 <img src="${demon.difficultyIcon}" alt="${demon.difficulty}" class="difficulty-icon">
-                                ${demon.difficulty}
+                                ${demon.difficulty} (Tier ${demon.tier || 1})
                             </span>
                         </div>
                         <div class="info-row">
