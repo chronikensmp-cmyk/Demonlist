@@ -5,65 +5,341 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>German Demonlist</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: #121318; color: #e0e0e0; height: 100vh; overflow: hidden; }
-        .app-container { display: flex; height: 100vh; flex-direction: column; }
-        @media (min-width: 600px) { .app-container { flex-direction: row; } }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
 
-        .sidebar { width: 100%; background-color: #1a1b23; border-bottom: 1px solid #2a2c3a; display: flex; flex-direction: column; padding: 15px; max-height: 40vh; }
-        @media (min-width: 600px) { .sidebar { width: 320px; max-height: 100vh; border-right: 1px solid #2a2c3a; border-bottom: none; } }
+        body {
+            background-color: #121318;
+            color: #e0e0e0;
+            height: 100vh;
+            overflow: hidden;
+        }
 
-        .logo { font-size: 22px; font-weight: bold; color: #fff; margin-bottom: 10px; cursor: pointer; }
-        .logo-highlight { color: #ff6b00; }
-        .tabs { display: flex; gap: 10px; margin-bottom: 10px; }
-        .tab { background: none; border: none; color: #888; border-bottom: 2px solid transparent; padding: 5px 10px; font-weight: bold; cursor: pointer; }
-        .tab.active { color: #ff6b00; border-bottom: 2px solid #ff6b00; }
-        #search { width: 100%; padding: 8px 12px; background-color: #121318; border: 1px solid #2a2c3a; border-radius: 6px; color: white; margin-bottom: 10px; }
-        
-        .level-list { list-style: none; overflow-y: auto; flex-grow: 1; }
-        .level-item { padding: 10px; border-radius: 6px; margin-bottom: 5px; cursor: pointer; background-color: #21232e; display: flex; gap: 10px; }
-        .level-item.active { background-color: #ff6b00; color: white; }
-        .rank { font-weight: bold; }
+        .app-container {
+            display: flex;
+            height: 100vh;
+            flex-direction: column;
+        }
 
-        .main-wrapper { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .top-header { background-color: #1a1b23; border-bottom: 1px solid #2a2c3a; padding: 10px 20px; display: flex; justify-content: flex-end; align-items: center; gap: 10px; }
-        .account-btn { display: flex; align-items: center; gap: 10px; background-color: #21232e; border: 1px solid #2a2c3a; padding: 6px 12px; border-radius: 20px; cursor: pointer; color: #fff; font-weight: bold; font-size: 14px; transition: background-color 0.2s; }
-        .account-btn:hover { background-color: #2a2c3a; }
-        .avatar-img { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; background-color: #2a2c3a; }
+        @media (min-width: 600px) {
+            .app-container {
+                flex-direction: row;
+            }
+        }
 
-        .content { flex-grow: 1; padding: 20px; overflow-y: auto; }
-        .level-title-container { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; max-width: 650px; }
-        .level-title { font-size: 28px; }
-        .description { color: #aaa; margin-bottom: 15px; font-size: 14px; }
-        .video-container { position: relative; width: 100%; max-width: 650px; aspect-ratio: 16 / 9; margin-bottom: 15px; border-radius: 8px; overflow: hidden; background: #000; }
-        .video-container iframe { width: 100%; height: 100%; border: none; }
+        /* Sidebar / Liste */
+        .sidebar {
+            width: 100%;
+            background-color: #1a1b23;
+            border-bottom: 1px solid #2a2c3a;
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            max-height: 40vh;
+        }
 
-        .info-card { background-color: #1a1b23; padding: 15px; border-radius: 8px; max-width: 650px; border: 1px solid #2a2c3a; }
-        .info-row { margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2a2c3a; padding-bottom: 6px; font-size: 14px; }
-        .info-label { color: #888; font-weight: bold; }
-        .info-value { color: #fff; display: flex; align-items: center; gap: 8px; }
-        .difficulty-icon { height: 24px; width: auto; }
-        .highlight-name { color: #ff6b00; font-weight: bold; }
+        @media (min-width: 600px) {
+            .sidebar {
+                width: 320px;
+                max-height: 100vh;
+                border-right: 1px solid #2a2c3a;
+                border-bottom: none;
+            }
+        }
 
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); z-index: 1000; justify-content: center; align-items: center; }
-        .modal.active { display: flex; }
-        .modal-content { background-color: #1a1b23; border: 1px solid #2a2c3a; border-radius: 8px; padding: 25px; width: 90%; max-width: 450px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); max-height: 90vh; overflow-y: auto; }
-        .modal-title { font-size: 20px; margin-bottom: 15px; color: #fff; }
+        .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
 
-        .form-group { margin-bottom: 12px; }
-        .form-group label { display: block; font-size: 12px; color: #888; margin-bottom: 4px; }
-        .form-group input, .form-group select { width: 100%; padding: 10px; background-color: #121318; border: 1px solid #2a2c3a; border-radius: 6px; color: #fff; }
-        .checkbox-group { display: flex; align-items: center; gap: 8px; margin-bottom: 15px; font-size: 13px; color: #aaa; }
+        .logo-highlight {
+            color: #ff6b00;
+        }
 
-        .btn-primary { width: 100%; padding: 10px; background-color: #ff6b00; border: none; border-radius: 6px; color: white; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
-        .btn-secondary { width: 100%; padding: 8px; background-color: transparent; border: 1px solid #2a2c3a; border-radius: 6px; color: #888; cursor: pointer; }
-        .btn-edit { background-color: #ff6b00; border: none; color: white; font-weight: bold; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; }
-        .error-message { color: #ff4d4d; font-size: 12px; margin-bottom: 10px; display: none; }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
 
-        .profile-avatar-large { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin: 0 auto 15px auto; display: block; border: 2px solid #ff6b00; background-color: #2a2c3a; }
-        .submission-card { background-color: #121318; border: 1px solid #2a2c3a; border-radius: 6px; padding: 12px; margin-bottom: 12px; font-size: 13px; }
-        .submission-card h4 { color: #ff6b00; margin-bottom: 6px; }
-        .admin-manage-box { background-color: #121318; border: 1px solid #2a2c3a; border-radius: 6px; padding: 15px; margin-top: 20px; max-width: 650px; }
+        .tab {
+            background: none;
+            border: none;
+            color: #888;
+            border-bottom: 2px solid transparent;
+            padding: 5px 10px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .tab.active {
+            color: #ff6b00;
+            border-bottom: 2px solid #ff6b00;
+        }
+
+        #search {
+            width: 100%;
+            padding: 8px 12px;
+            background-color: #121318;
+            border: 1px solid #2a2c3a;
+            border-radius: 6px;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .level-list {
+            list-style: none;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        .level-item {
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            background-color: #21232e;
+            display: flex;
+            gap: 10px;
+        }
+
+        .level-item.active {
+            background-color: #ff6b00;
+            color: white;
+        }
+
+        .rank {
+            font-weight: bold;
+        }
+
+        /* Main Layout Header & Content */
+        .main-wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .top-header {
+            background-color: #1a1b23;
+            border-bottom: 1px solid #2a2c3a;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .account-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background-color: #21232e;
+            border: 1px solid #2a2c3a;
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            color: #fff;
+            font-weight: bold;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+
+        .account-btn:hover {
+            background-color: #2a2c3a;
+        }
+
+        .avatar-img {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            object-fit: cover;
+            background-color: #2a2c3a;
+        }
+
+        /* Contentbereich */
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .level-title {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .description {
+            color: #aaa;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-width: 650px;
+            aspect-ratio: 16 / 9;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .video-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .info-card {
+            background-color: #1a1b23;
+            padding: 15px;
+            border-radius: 8px;
+            max-width: 650px;
+            border: 1px solid #2a2c3a;
+        }
+
+        .info-row {
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #2a2c3a;
+            padding-bottom: 6px;
+            font-size: 14px;
+        }
+
+        .info-label {
+            color: #888;
+            font-weight: bold;
+        }
+
+        .info-value {
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .difficulty-icon {
+            height: 24px;
+            width: auto;
+        }
+
+        .highlight-name {
+            color: #ff6b00;
+            font-weight: bold;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: #1a1b23;
+            border: 1px solid #2a2c3a;
+            border-radius: 8px;
+            padding: 25px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-title {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 4px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            background-color: #121318;
+            border: 1px solid #2a2c3a;
+            border-radius: 6px;
+            color: #fff;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            color: #aaa;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 10px;
+            background-color: #ff6b00;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        .btn-secondary {
+            width: 100%;
+            padding: 8px;
+            background-color: transparent;
+            border: 1px solid #2a2c3a;
+            border-radius: 6px;
+            color: #888;
+            cursor: pointer;
+        }
+
+        .error-message {
+            color: #ff4d4d;
+            font-size: 12px;
+            margin-bottom: 10px;
+            display: none;
+        }
+
+        .profile-avatar-large {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 15px auto;
+            display: block;
+            border: 2px solid #ff6b00;
+            background-color: #2a2c3a;
+        }
     </style>
 </head>
 <body>
@@ -71,25 +347,21 @@
     <div class="app-container">
         <!-- Sidebar -->
         <aside class="sidebar">
-            <div class="logo" onclick="window.switchTab('classic')">
+            <div class="logo" onclick="switchTab('classic')">
                 <span class="logo-highlight">German</span> Demonlist
             </div>
             <div class="tabs">
-                <button class="tab active" id="tab-classic" onclick="window.switchTab('classic')">CLASSIC</button>
-                <button class="tab" id="tab-players" onclick="window.switchTab('players')">PLAYERS</button>
+                <button class="tab active" id="tab-classic" onclick="switchTab('classic')">CLASSIC</button>
+                <button class="tab" id="tab-players" onclick="switchTab('players')">PLAYERS</button>
             </div>
-            <input type="text" id="search" placeholder="Search..." onkeyup="window.filterLevels()">
-            <button class="btn-primary" style="margin-bottom: 10px;" onclick="window.openSubmitModal()">+ Submit Level</button>
+            <input type="text" id="search" placeholder="Search..." onkeyup="filterLevels()">
             <ul id="level-list" class="level-list"></ul>
         </aside>
 
         <!-- Main Wrapper -->
         <div class="main-wrapper">
             <header class="top-header">
-                <button id="admin-pending-btn" class="account-btn" style="display: none; border-color: #ff6b00;" onclick="window.openAdminModal()">
-                    Admin Pending (<span id="pending-count">0</span>)
-                </button>
-                <button class="account-btn" onclick="window.handleAccountClick()">
+                <button class="account-btn" onclick="handleAccountClick()">
                     <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23888888'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/></svg>" id="header-avatar" class="avatar-img" alt="Avatar">
                     <span id="header-username">Log In / Register</span>
                 </button>
@@ -101,16 +373,16 @@
         </div>
     </div>
 
-    <!-- Modal Log In / Register -->
+    <!-- Modal -->
     <div class="modal" id="auth-modal">
         <div class="modal-content">
             <h2 class="modal-title" id="auth-title">Log In</h2>
             <div class="error-message" id="auth-error"></div>
             
-            <form id="auth-form" onsubmit="window.handleAuthSubmit(event)">
+            <form id="auth-form" onsubmit="handleAuthSubmit(event)">
                 <div class="form-group" id="username-group" style="display: none;">
                     <label for="auth-username">Ingame Username</label>
-                    <input type="text" id="auth-username" placeholder="e.g. qChrc">
+                    <input type="text" id="auth-username" placeholder="e.g. Derlery5">
                 </div>
                 <div class="form-group">
                     <label for="auth-email">Email</label>
@@ -126,170 +398,9 @@
                 </div>
 
                 <button type="submit" class="btn-primary" id="auth-submit-btn">Log In</button>
-                <button type="button" class="btn-secondary" onclick="window.toggleAuthMode()" id="auth-toggle-btn">Need an account? Register</button>
-                <button type="button" class="btn-secondary" onclick="window.closeAuthModal()" style="margin-top: 5px;">Cancel</button>
+                <button type="button" class="btn-secondary" onclick="toggleAuthMode()" id="auth-toggle-btn">Need an account? Register</button>
+                <button type="button" class="btn-secondary" onclick="closeAuthModal()" style="margin-top: 5px;">Cancel</button>
             </form>
-        </div>
-    </div>
-
-    <!-- Modal Submit Level -->
-    <div class="modal" id="submit-modal">
-        <div class="modal-content">
-            <h2 class="modal-title">Submit Level / Record</h2>
-            <div class="error-message" id="submit-error"></div>
-            <form id="submit-form" onsubmit="window.handleFormSubmission(event)">
-                <div class="form-group">
-                    <label for="sub-player">Ingame Username</label>
-                    <input type="text" id="sub-player" required placeholder="e.g. qChrc">
-                </div>
-                <div class="form-group">
-                    <label for="sub-name">Level Name</label>
-                    <input type="text" id="sub-name" required placeholder="e.g. Bloodbath">
-                </div>
-                <div class="form-group">
-                    <label for="sub-difficulty">Difficulty</label>
-                    <select id="sub-difficulty">
-                        <option value="Easy Demon">Easy Demon</option>
-                        <option value="Medium Demon">Medium Demon</option>
-                        <option value="Hard Demon">Hard Demon</option>
-                        <option value="Insane Demon">Insane Demon</option>
-                        <option value="Extreme Demon">Extreme Demon</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="sub-publisher">Publisher</label>
-                    <input type="text" id="sub-publisher" required placeholder="e.g. Riot">
-                </div>
-                <div class="form-group">
-                    <label for="sub-creator">Creator</label>
-                    <input type="text" id="sub-creator" required placeholder="e.g. Riot & More">
-                </div>
-                <div class="form-group">
-                    <label for="sub-youtube">YouTube Video ID (e.g. JCAOQQu4Iy0)</label>
-                    <input type="text" id="sub-youtube" required placeholder="JCAOQQu4Iy0">
-                </div>
-                <div class="form-group">
-                    <label for="sub-description">Description / Notes</label>
-                    <input type="text" id="sub-description" placeholder="Optional info">
-                </div>
-
-                <button type="submit" class="btn-primary">Submit</button>
-                <button type="button" class="btn-secondary" onclick="window.closeSubmitModal()">Cancel</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal Edit Level (Admin/Owner) -->
-    <div class="modal" id="edit-modal">
-        <div class="modal-content">
-            <h2 class="modal-title">Edit Level</h2>
-            <form id="edit-form" onsubmit="window.handleLevelEditSubmit(event)">
-                <input type="hidden" id="edit-index">
-                <div class="form-group">
-                    <label for="edit-rank">Platzierung (Rang)</label>
-                    <input type="number" id="edit-rank" min="1" required>
-                </div>
-                <div class="form-group">
-                    <label for="edit-tier">Tier (1-10)</label>
-                    <select id="edit-tier">
-                        <option value="1">1 (x1.0)</option>
-                        <option value="2">2 (x1.2)</option>
-                        <option value="3">3 (x1.4)</option>
-                        <option value="4">4 (x1.6)</option>
-                        <option value="5">5 (x1.8)</option>
-                        <option value="6">6 (x2.0)</option>
-                        <option value="7">7 (x2.3)</option>
-                        <option value="8">8 (x2.6)</option>
-                        <option value="9">9 (x3.0)</option>
-                        <option value="10">10 (x3.5)</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="edit-name">Level Name</label>
-                    <input type="text" id="edit-name" required>
-                </div>
-                <div class="form-group">
-                    <label for="edit-difficulty">Difficulty</label>
-                    <select id="edit-difficulty">
-                        <option value="Easy Demon">Easy Demon</option>
-                        <option value="Medium Demon">Medium Demon</option>
-                        <option value="Hard Demon">Hard Demon</option>
-                        <option value="Insane Demon">Insane Demon</option>
-                        <option value="Extreme Demon">Extreme Demon</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="edit-publisher">Publisher</label>
-                    <input type="text" id="edit-publisher" required>
-                </div>
-                <div class="form-group">
-                    <label for="edit-creator">Creator</label>
-                    <input type="text" id="edit-creator" required>
-                </div>
-                <div class="form-group">
-                    <label for="edit-verifier">Verifier</label>
-                    <input type="text" id="edit-verifier" required>
-                </div>
-                <div class="form-group">
-                    <label for="edit-orig-verifier">Original Verifier</label>
-                    <input type="text" id="edit-orig-verifier" required>
-                </div>
-                <div class="form-group">
-                    <label for="edit-victors">Other Victors (mit Komma trennen)</label>
-                    <input type="text" id="edit-victors" placeholder="z.B. Player1, Player2">
-                </div>
-                <div class="form-group">
-                    <label for="edit-youtube">YouTube Video ID</label>
-                    <input type="text" id="edit-youtube" required>
-                </div>
-                <div class="form-group">
-                    <label for="edit-description">Description</label>
-                    <input type="text" id="edit-description">
-                </div>
-
-                <button type="submit" class="btn-primary">Save Changes</button>
-                <button type="button" class="btn-secondary" onclick="window.closeEditModal()">Cancel</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal Edit Player (Admin/Owner) -->
-    <div class="modal" id="edit-player-modal">
-        <div class="modal-content">
-            <h2 class="modal-title">Edit Player</h2>
-            <form id="edit-player-form" onsubmit="window.handlePlayerEditSubmit(event)">
-                <input type="hidden" id="edit-player-index">
-                <div class="form-group">
-                    <label for="edit-player-name">Player Name</label>
-                    <input type="text" id="edit-player-name" required>
-                </div>
-                <div class="form-group">
-                    <label for="edit-player-points">Points</label>
-                    <input type="number" step="0.1" id="edit-player-points" required>
-                </div>
-                <div class="form-group">
-                    <label for="edit-player-hardest">Current Hardest</label>
-                    <input type="text" id="edit-player-hardest" required>
-                </div>
-                <div class="form-group">
-                    <label for="edit-player-extremes">Beaten Extremes (mit Komma trennen)</label>
-                    <input type="text" id="edit-player-extremes" placeholder="z.B. Cataclysm, ACU">
-                </div>
-
-                <button type="submit" class="btn-primary">Save Player Changes</button>
-                <button type="button" class="btn-secondary" onclick="window.closeEditPlayerModal()">Cancel</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal Admin Pending Submissions -->
-    <div class="modal" id="admin-modal">
-        <div class="modal-content">
-            <h2 class="modal-title">Pending Submissions</h2>
-            <div id="admin-submissions-list">
-                <p style="color: #888;">No pending submissions.</p>
-            </div>
-            <button type="button" class="btn-secondary" onclick="window.closeAdminModal()" style="margin-top: 15px;">Close</button>
         </div>
     </div>
 
@@ -311,13 +422,7 @@
             doc, 
             setDoc, 
             getDoc,
-            updateDoc,
-            collection,
-            addDoc,
-            getDocs,
-            deleteDoc,
-            query,
-            where
+            updateDoc
         } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -338,105 +443,6 @@
 
         let currentUserData = null;
         let isRegisterMode = false;
-        let pendingSubmissions = [];
-
-        const OWNER_NAME = "qchrc"; 
-
-        window.currentTab = "classic";
-
-        // Tabellen für Punkteberechnung (Tier-System)
-        const baseValues = {
-            "Easy Demon": 1,
-            "Medium Demon": 2,
-            "Hard Demon": 3,
-            "Insane Demon": 5,
-            "Extreme Demon": 10
-        };
-
-        const tierMultipliers = {
-            1: 1.0,
-            2: 1.2,
-            3: 1.4,
-            4: 1.6,
-            5: 1.8,
-            6: 2.0,
-            7: 2.3,
-            8: 2.6,
-            9: 3.0,
-            10: 3.5
-        };
-
-        function calculatePoints(difficulty, tier) {
-            const base = baseValues[difficulty] || 1;
-            const mult = tierMultipliers[tier] || 1.0;
-            return Math.round((base * mult) * 10) / 10;
-        }
-
-        let demons = [
-            { rank: 1, name: "Tung Tung Tung Sahurcles", difficulty: "Extreme Demon", difficultyIcon: "extreme.jpg", publisher: "ArraegenGD", creator: "ArraegenGD", myVerifier: "Derlery5", originalVerifier: "Nova4664", victors: ["Player1", "Player2"], youtubeId: "JCAOQQu4Iy0", description: "Tripple T", tier: 10 },
-            { rank: 2, name: "Cataclysm", difficulty: "Extreme Demon", difficultyIcon: "extreme.jpg", publisher: "Ggb0y", creator: "Ggb0y", myVerifier: "Derlery5", originalVerifier: "Riot", victors: ["Player1", "Player2"], youtubeId: "Kd-G_pd3OPw", description: "~6200 Attempts.", tier: 8 },
-            { rank: 3, name: "Sweather Weather", difficulty: "Extreme Demon", difficultyIcon: "extreme.jpg", publisher: "VelYT", creator: "VelYT", myVerifier: "Limbu", originalVerifier: "Xfire", victors: ["Player 1"], youtubeId: "7CZFG9oisPI", description: "Deep Level", tier: 7 },
-            { rank: 4, name: "ACU", difficulty: "Extreme Demon", difficultyIcon: "extreme.jpg", publisher: "neigefeu", creator: "neigefeu", myVerifier: "Derlery5", originalVerifier: "neigefeu", victors: ["Limbu"], youtubeId: "riMBe0u4FpU", description: "Einfachster Extreme.", tier: 3 },
-            { rank: 5, name: "Poltergeist", difficulty: "Insane Demon", difficultyIcon: "insane.png", publisher: "Andromeda", creator: "Andromeda", myVerifier: "Derlery5", originalVerifier: "Andromeda", victors: ["Player1"], youtubeId: "uUP6l68Tsg0", description: "Cooles Level", tier: 7 },
-            { rank: 6, name: "Sonic Wave Universe", difficulty: "Insane Demon", difficultyIcon: "insane.png", publisher: "HuyChoiGeoDat", creator: "HuyChoiGeoDat", myVerifier: "Derlery5", originalVerifier: "HuyChoiGeoDat", victors: ["Player1"], youtubeId: "i4fROh81T6U", description: "Cooles sw Level", tier: 6 },
-            { rank: 7, name: "Inane Demon", difficulty: "Insane Demon", difficultyIcon: "insane.png", publisher: "KiwiPenguin", creator: "KiwiPenguin", myVerifier: "Derlery5", originalVerifier: "KiwiPenguin", victors: ["Player1"], youtubeId: "OjRwvdtjuqE", description: "Funny April Joke", tier: 5 },
-            { rank: 8, name: "Stalemate", difficulty: "Insane Demon", difficultyIcon: "insane.png", publisher: "Nox", creator: "Nox", myVerifier: "Derlery5", originalVerifier: "Nox", victors: ["Player1"], youtubeId: "h0ePMjhnUNI", description: "1.9", tier: 4 },
-            { rank: 9, name: "Windy Landscape", difficulty: "Insane Demon", difficultyIcon: "insane.png", publisher: "WOOGI1411", creator: "WOOGI1411", myVerifier: "Derlery5", originalVerifier: "GuitarHeroStyles", victors: ["Player1"], youtubeId: "UWUmUDGY31k", description: "Ikonisch", tier: 3 },
-            { rank: 10, name: "CraZy", difficulty: "Insane Demon", difficultyIcon: "insane.png", publisher: "DavJT", creator: "DavJT", myVerifier: "Derlery5", originalVerifier: "DavJT", victors: ["Player1"], youtubeId: "InQNiq9IKxA", description: "Tuff", tier: 2 },
-            { rank: 11, name: "CraZy II", difficulty: "Insane Demon", difficultyIcon: "insane.png", publisher: "DavJT", creator: "DavJT & N R G", myVerifier: "Derlery5", originalVerifier: "DavJT", victors: ["Player1"], youtubeId: "A1YYMgkAzWI", description: "Tuff II", tier: 4 },
-            { rank: 12, name: "Mechanical Showdown", difficulty: "Medium Demon", difficultyIcon: "medium.webp", publisher: "Tongii", creator: "Tongii", myVerifier: "Derlery5", originalVerifier: "Tongii", victors: ["Player1"], youtubeId: "TlxSOw8PyVs", description: "Mechanical", tier: 5 },
-            { rank: 13, name: "Skelletal Shenanigans", difficulty: "Medium Demon", difficultyIcon: "medium.webp", publisher: "YoReid", creator: "YoReid & Airzyy", myVerifier: "qChrc", originalVerifier: "YoReid", victors: ["Derlery5"], youtubeId: "-hU6A5kby0I", description: "New Hardest", tier: 3 },
-            { rank: 14, name: "KATAMARI", difficulty: "Medium Demon", difficultyIcon: "medium.webp", publisher: "MonkeyInABowl", creator: "MonkeyInABowl", myVerifier: "Derlery5", originalVerifier: "MonkeyInABowl", victors: ["Player1"], youtubeId: "XD-wZE7MMKE", description: "Bruh", tier: 2 },
-            { rank: 15, name: "Shiver", difficulty: "Easy Demon", difficultyIcon: "easy.webp", publisher: "SpKale", creator: "SpKale", myVerifier: "Ihia", originalVerifier: "SpKale", victors: ["Player1"], youtubeId: "hRJR3zGCmhE", description: "Erster EZ Demon", tier: 1 }
-        ];
-
-        let players = [
-            { placement: 1, name: "Derlery5", currentHardest: "Tung Tung Tung Sahurcles", points: 107, beatenExtremes: ["Tung Tung Tung Sahurcles", "Cataclysm", "ACU"] },
-            { placement: 2, name: "Limbu", currentHardest: "Sweather Weather", points: 30, beatenExtremes: ["Sweather Weather", "ACU"] },
-            { placement: 3, name: "qChrc", currentHardest: "Skelletal Shenanigans", points: 1, beatenExtremes: [] },
-            { placement: 4, name: "Ihia", currentHardest: "Shiver", points: 1, beatenExtremes: [] }
-        ];
-
-        async function loadDataFromFirestore() {
-            try {
-                const demonsDoc = await getDoc(doc(db, "listdata", "demons"));
-                const playersDoc = await getDoc(doc(db, "listdata", "players"));
-
-                if (demonsDoc.exists() && playersDoc.exists()) {
-                    demons = demonsDoc.data().items || [];
-                    players = playersDoc.data().items || [];
-                } else {
-                    await saveDataToFirestore();
-                }
-                loadLevelList();
-            } catch (e) {
-                console.error("Fehler beim Laden aus Firestore: ", e);
-                loadLevelList();
-            }
-        }
-
-        async function saveDataToFirestore() {
-            try {
-                await setDoc(doc(db, "listdata", "demons"), { items: demons });
-                await setDoc(doc(db, "listdata", "players"), { items: players });
-            } catch (e) {
-                console.error("Fehler beim Speichern in Firestore: ", e);
-            }
-        }
-
-        function isUserAdmin() {
-            if (!currentUserData) return false;
-            const name = (currentUserData.username || "").toLowerCase();
-            const role = (currentUserData.role || "").toLowerCase();
-            return name === OWNER_NAME || role === "admin" || role === "owner";
-        }
-
-        function isUserOwner() {
-            if (!currentUserData) return false;
-            const name = (currentUserData.username || "").toLowerCase();
-            const role = (currentUserData.role || "").toLowerCase();
-            return name === OWNER_NAME || role === "owner";
-        }
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
@@ -446,16 +452,13 @@
                 } else {
                     currentUserData = {
                         username: user.email.split("@")[0],
-                        avatarUrl: DEFAULT_AVATAR,
-                        role: "user"
+                        avatarUrl: DEFAULT_AVATAR
                     };
                 }
                 updateHeaderUI(true);
-                checkAdminStatus();
             } else {
                 currentUserData = null;
                 updateHeaderUI(false);
-                document.getElementById("admin-pending-btn").style.display = "none";
             }
         });
 
@@ -472,406 +475,18 @@
             }
         }
 
-        async function checkAdminStatus() {
-            if (isUserAdmin()) {
-                document.getElementById("admin-pending-btn").style.display = "flex";
-                loadPendingSubmissions();
-            } else {
-                document.getElementById("admin-pending-btn").style.display = "none";
-            }
-        }
-
-        async function loadPendingSubmissions() {
-            try {
-                const querySnapshot = await getDocs(collection(db, "submissions"));
-                pendingSubmissions = [];
-                querySnapshot.forEach((docSnap) => {
-                    pendingSubmissions.push({ id: docSnap.id, ...docSnap.data() });
-                });
-                document.getElementById("pending-count").textContent = pendingSubmissions.length;
-            } catch (e) {
-                console.error("Error loading submissions: ", e);
-            }
-        }
-
-        window.promoteToAdmin = async function() {
-            if (!isUserOwner()) return;
-            const targetUsername = document.getElementById("admin-promote-input").value.trim();
-            if (!targetUsername) return;
-
-            try {
-                const q = query(collection(db, "users"), where("username", "==", targetUsername));
-                const querySnapshot = await getDocs(q);
-
-                if (querySnapshot.empty) {
-                    alert("Benutzer nicht gefunden!");
-                    return;
-                }
-
-                querySnapshot.forEach(async (userDoc) => {
-                    await updateDoc(doc(db, "users", userDoc.id), { role: "admin" });
-                    alert(`${targetUsername} wurde erfolgreich zum Admin befördert!`);
-                    document.getElementById("admin-promote-input").value = "";
-                });
-            } catch (e) {
-                alert("Fehler bei Beförderung: " + e.message);
-            }
-        };
-
-        window.demoteAdmin = async function() {
-            if (!isUserOwner()) return;
-            const targetUsername = document.getElementById("admin-promote-input").value.trim();
-            if (!targetUsername) return;
-
-            if (targetUsername.toLowerCase() === OWNER_NAME) {
-                alert("Der Owner kann nicht degradiert werden!");
-                return;
-            }
-
-            try {
-                const q = query(collection(db, "users"), where("username", "==", targetUsername));
-                const querySnapshot = await getDocs(q);
-
-                if (querySnapshot.empty) {
-                    alert("Benutzer nicht gefunden!");
-                    return;
-                }
-
-                querySnapshot.forEach(async (userDoc) => {
-                    await updateDoc(doc(db, "users", userDoc.id), { role: "user" });
-                    alert(`${targetUsername} wurde wieder zum normalen User degradiert.`);
-                    document.getElementById("admin-promote-input").value = "";
-                });
-            } catch (e) {
-                alert("Fehler bei Degradierung: " + e.message);
-            }
-        };
-
-        window.openEditModal = function(index) {
-            if (!isUserAdmin()) return;
-            const demon = demons[index];
-            document.getElementById("edit-index").value = index;
-            document.getElementById("edit-rank").value = demon.rank;
-            document.getElementById("edit-tier").value = demon.tier || 1;
-            document.getElementById("edit-name").value = demon.name;
-            document.getElementById("edit-difficulty").value = demon.difficulty;
-            document.getElementById("edit-publisher").value = demon.publisher;
-            document.getElementById("edit-creator").value = demon.creator;
-            document.getElementById("edit-verifier").value = demon.myVerifier;
-            document.getElementById("edit-orig-verifier").value = demon.originalVerifier || "";
-            document.getElementById("edit-victors").value = demon.victors ? demon.victors.join(", ") : "";
-            document.getElementById("edit-youtube").value = demon.youtubeId;
-            document.getElementById("edit-description").value = demon.description || "";
-
-            document.getElementById("edit-modal").classList.add("active");
-        };
-
-        window.closeEditModal = function() {
-            document.getElementById("edit-modal").classList.remove("active");
-        };
-
-        window.handleLevelEditSubmit = async function(e) {
-            e.preventDefault();
-            if (!isUserAdmin()) {
-                alert("Keine Berechtigung!");
-                return;
-            }
-
-            const index = parseInt(document.getElementById("edit-index").value);
-            const newRank = parseInt(document.getElementById("edit-rank").value);
-            const newTier = parseInt(document.getElementById("edit-tier").value) || 1;
-
-            let diffIcon = "easy.webp";
-            const diff = document.getElementById("edit-difficulty").value;
-            if (diff === "Medium Demon") diffIcon = "medium.webp";
-            if (diff === "Insane Demon") diffIcon = "insane.png";
-            if (diff === "Extreme Demon") diffIcon = "extreme.jpg";
-
-            const rawVictors = document.getElementById("edit-victors").value;
-            const victorsArray = rawVictors
-                .split(",")
-                .map(v => v.trim())
-                .filter(v => v.length > 0);
-
-            const updatedDemon = {
-                ...demons[index],
-                rank: newRank,
-                tier: newTier,
-                name: document.getElementById("edit-name").value.trim(),
-                difficulty: diff,
-                difficultyIcon: diffIcon,
-                publisher: document.getElementById("edit-publisher").value.trim(),
-                creator: document.getElementById("edit-creator").value.trim(),
-                myVerifier: document.getElementById("edit-verifier").value.trim(),
-                originalVerifier: document.getElementById("edit-orig-verifier").value.trim(),
-                victors: victorsArray,
-                youtubeId: document.getElementById("edit-youtube").value.trim(),
-                description: document.getElementById("edit-description").value.trim()
-            };
-
-            demons.splice(index, 1);
-            demons.splice(newRank - 1, 0, updatedDemon);
-            demons.forEach((d, i) => d.rank = i + 1);
-
-            await saveDataToFirestore();
-            window.closeEditModal();
-            loadLevelList();
-            selectLevel(newRank - 1);
-        };
-
-        window.openEditPlayerModal = function(index) {
-            if (!isUserAdmin()) return;
-            const player = players[index];
-            document.getElementById("edit-player-index").value = index;
-            document.getElementById("edit-player-name").value = player.name;
-            document.getElementById("edit-player-points").value = player.points;
-            document.getElementById("edit-player-hardest").value = player.currentHardest;
-            document.getElementById("edit-player-extremes").value = player.beatenExtremes ? player.beatenExtremes.join(", ") : "";
-
-            document.getElementById("edit-player-modal").classList.add("active");
-        };
-
-        window.closeEditPlayerModal = function() {
-            document.getElementById("edit-player-modal").classList.remove("active");
-        };
-
-        window.handlePlayerEditSubmit = async function(e) {
-            e.preventDefault();
-            if (!isUserAdmin()) {
-                alert("Keine Berechtigung!");
-                return;
-            }
-
-            const index = parseInt(document.getElementById("edit-player-index").value);
-            const rawExtremes = document.getElementById("edit-player-extremes").value;
-            const extremesArray = rawExtremes
-                .split(",")
-                .map(ex => ex.trim())
-                .filter(ex => ex.length > 0);
-
-            const updatedName = document.getElementById("edit-player-name").value.trim();
-
-            players[index] = {
-                ...players[index],
-                name: updatedName,
-                points: parseFloat(document.getElementById("edit-player-points").value) || 0,
-                currentHardest: document.getElementById("edit-player-hardest").value.trim(),
-                beatenExtremes: extremesArray
-            };
-
-            players.sort((a, b) => b.points - a.points);
-            players.forEach((p, i) => p.placement = i + 1);
-
-            await saveDataToFirestore();
-            window.closeEditPlayerModal();
-            loadLevelList();
-            
-            const updatedIndex = players.findIndex(p => p.name === updatedName);
-            selectLevel(updatedIndex >= 0 ? updatedIndex : 0);
-        };
-
-        window.openSubmitModal = function() {
-            if (!auth.currentUser) {
-                window.openAuthModal();
-                return;
-            }
-            if (currentUserData && currentUserData.username) {
-                document.getElementById("sub-player").value = currentUserData.username;
-            }
-            document.getElementById("submit-modal").classList.add("active");
-            document.getElementById("submit-error").style.display = "none";
-        };
-
-        window.closeSubmitModal = function() {
-            document.getElementById("submit-modal").classList.remove("active");
-        };
-
-        window.handleFormSubmission = async function(e) {
-            e.preventDefault();
-            const player = document.getElementById("sub-player").value.trim();
-            const name = document.getElementById("sub-name").value.trim();
-            const difficulty = document.getElementById("sub-difficulty").value;
-            const publisher = document.getElementById("sub-publisher").value.trim();
-            const creator = document.getElementById("sub-creator").value.trim();
-            const youtubeId = document.getElementById("sub-youtube").value.trim();
-            const description = document.getElementById("sub-description").value.trim();
-
-            try {
-                await addDoc(collection(db, "submissions"), {
-                    player, name, difficulty, publisher, creator, youtubeId, description,
-                    submittedAt: new Date().toISOString()
-                });
-                alert("Submission successful! Waiting for approval.");
-                window.closeSubmitModal();
-                if (isUserAdmin()) loadPendingSubmissions();
-            } catch (err) {
-                const errEl = document.getElementById("submit-error");
-                errEl.textContent = err.message;
-                errEl.style.display = "block";
-            }
-        };
-
-        window.openAdminModal = async function() {
-            await loadPendingSubmissions();
-            const container = document.getElementById("admin-submissions-list");
-            container.innerHTML = "";
-
-            if (pendingSubmissions.length === 0) {
-                container.innerHTML = `<p style="color: #888;">No pending submissions.</p>`;
-            } else {
-                pendingSubmissions.forEach((sub, idx) => {
-                    const card = document.createElement("div");
-                    card.className = "submission-card";
-                    card.innerHTML = `
-                        <h4>${sub.name} (${sub.difficulty})</h4>
-                        <p><strong>Player:</strong> ${sub.player}</p>
-                        <p><strong>Publisher/Creator:</strong> ${sub.publisher} / ${sub.creator}</p>
-                        <p><strong>YouTube ID:</strong> ${sub.youtubeId}</p>
-                        <div style="margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
-                            <label style="font-size: 11px;">Rang:</label>
-                            <input type="number" id="rank-input-${idx}" min="1" max="${demons.length + 1}" value="1" style="width: 50px; padding: 4px; background: #1a1b23; border: 1px solid #2a2c3a; color: white; border-radius: 4px;">
-                            
-                            <label style="font-size: 11px;">Tier (1-10):</label>
-                            <select id="tier-input-${idx}" style="padding: 4px; background: #1a1b23; border: 1px solid #2a2c3a; color: white; border-radius: 4px;">
-                                <option value="1">1 (x1.0)</option>
-                                <option value="2">2 (x1.2)</option>
-                                <option value="3">3 (x1.4)</option>
-                                <option value="4">4 (x1.6)</option>
-                                <option value="5">5 (x1.8)</option>
-                                <option value="6">6 (x2.0)</option>
-                                <option value="7">7 (x2.3)</option>
-                                <option value="8">8 (x2.6)</option>
-                                <option value="9">9 (x3.0)</option>
-                                <option value="10">10 (x3.5)</option>
-                            </select>
-
-                            <button class="btn-primary" style="width: auto; padding: 4px 10px; margin:0;" onclick="window.approveSubmission('${sub.id}', ${idx})">Approve</button>
-                            <button class="btn-secondary" style="width: auto; padding: 4px 10px; margin:0; color: #ff4d4d; border-color: #ff4d4d;" onclick="window.rejectSubmission('${sub.id}')">Reject</button>
-                        </div>
-                    `;
-                    container.appendChild(card);
-                });
-            }
-
-            document.getElementById("admin-modal").classList.add("active");
-        };
-
-        window.closeAdminModal = function() {
-            document.getElementById("admin-modal").classList.remove("active");
-        };
-
-        window.rejectSubmission = async function(docId) {
-            try {
-                await deleteDoc(doc(db, "submissions", docId));
-                window.openAdminModal();
-            } catch (e) {
-                alert("Error deleting submission: " + e.message);
-            }
-        };
-
-        window.approveSubmission = async function(docId, idx) {
-            const sub = pendingSubmissions.find(s => s.id === docId);
-            if (!sub) return;
-
-            const existingDemonIndex = demons.findIndex(d => d.name.toLowerCase() === sub.name.toLowerCase());
-            
-            let selectedTier = parseInt(document.getElementById(`tier-input-${idx}`).value) || 1;
-            let targetRank = parseInt(document.getElementById(`rank-input-${idx}`).value) || 1;
-            let levelDifficulty = sub.difficulty;
-            let levelName = sub.name;
-            let calculatedPoints = 0;
-
-            if (existingDemonIndex !== -1) {
-                const existingDemon = demons[existingDemonIndex];
-                targetRank = existingDemon.rank;
-                levelDifficulty = existingDemon.difficulty;
-                levelName = existingDemon.name;
-                selectedTier = existingDemon.tier || selectedTier;
-
-                calculatedPoints = calculatePoints(levelDifficulty, selectedTier);
-
-                if (!existingDemon.victors) {
-                    existingDemon.victors = [];
-                }
-
-                const alreadyVictor = existingDemon.victors.some(v => v.toLowerCase() === sub.player.toLowerCase());
-                const isVerifier = existingDemon.myVerifier.toLowerCase() === sub.player.toLowerCase();
-
-                if (!alreadyVictor && !isVerifier) {
-                    existingDemon.victors.push(sub.player);
-                }
-
-                alert(`Level "${levelName}" existiert bereits auf Rang #${targetRank}! ${sub.player} wurde zu den "Other Victors" hinzugefügt (+${calculatedPoints} Pkt.).`);
-            } else {
-                calculatedPoints = calculatePoints(levelDifficulty, selectedTier);
-
-                let diffIcon = "easy.webp";
-                if (levelDifficulty === "Medium Demon") diffIcon = "medium.webp";
-                if (levelDifficulty === "Insane Demon") diffIcon = "insane.png";
-                if (levelDifficulty === "Extreme Demon") diffIcon = "extreme.jpg";
-
-                const newDemon = {
-                    rank: targetRank,
-                    name: levelName,
-                    difficulty: levelDifficulty,
-                    difficultyIcon: diffIcon,
-                    publisher: sub.publisher,
-                    creator: sub.creator,
-                    myVerifier: sub.player,
-                    originalVerifier: sub.publisher,
-                    victors: [],
-                    youtubeId: sub.youtubeId,
-                    description: sub.description || "Community Submission",
-                    tier: selectedTier
-                };
-
-                demons.splice(targetRank - 1, 0, newDemon);
-                demons.forEach((d, i) => d.rank = i + 1);
-
-                alert(`Neues Level "${levelName}" auf Rang #${targetRank} genehmigt! (Tier ${selectedTier} | +${calculatedPoints} Pkt.)`);
-            }
-
-            // Spieler aktualisieren oder neu erstellen
-            let playerObj = players.find(p => p.name.toLowerCase() === sub.player.toLowerCase());
-            if (!playerObj) {
-                playerObj = {
-                    placement: players.length + 1,
-                    name: sub.player,
-                    currentHardest: levelName,
-                    points: Math.round(calculatedPoints * 10) / 10,
-                    beatenExtremes: levelDifficulty === "Extreme Demon" ? [levelName] : []
-                };
-                players.push(playerObj);
-            } else {
-                playerObj.points = Math.round((playerObj.points + calculatedPoints) * 10) / 10;
-                if (levelDifficulty === "Extreme Demon" && !playerObj.beatenExtremes.includes(levelName)) {
-                    playerObj.beatenExtremes.push(levelName);
-                }
-                playerObj.currentHardest = levelName;
-            }
-
-            players.sort((a, b) => b.points - a.points);
-            players.forEach((p, i) => p.placement = i + 1);
-
-            await deleteDoc(doc(db, "submissions", docId));
-            await saveDataToFirestore();
-
-            loadLevelList();
-            window.openAdminModal();
-        };
-
         window.handleAccountClick = function() {
             if (auth.currentUser) {
-                window.switchTab('profile');
+                switchTab('profile');
             } else {
-                window.openAuthModal();
+                openAuthModal();
             }
         };
 
-        window.openAuthModal = function() {
+        function openAuthModal() {
             document.getElementById("auth-modal").classList.add("active");
             document.getElementById("auth-error").style.display = "none";
-        };
+        }
 
         window.closeAuthModal = function() {
             document.getElementById("auth-modal").classList.remove("active");
@@ -904,19 +519,16 @@
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                     const user = userCredential.user;
 
-                    const isOwner = username.toLowerCase() === OWNER_NAME;
-
                     await setDoc(doc(db, "users", user.uid), {
                         username: username,
                         avatarUrl: DEFAULT_AVATAR,
-                        role: isOwner ? "owner" : "user",
                         createdAt: new Date().toISOString()
                     });
                 } else {
                     await signInWithEmailAndPassword(auth, email, password);
                 }
 
-                window.closeAuthModal();
+                closeAuthModal();
             } catch (error) {
                 errorElement.textContent = error.message;
                 errorElement.style.display = "block";
@@ -925,14 +537,16 @@
 
         window.handleLogout = async function() {
             await signOut(auth);
-            window.switchTab('classic');
+            switchTab('classic');
         };
 
         window.updateAvatarUrl = async function() {
             const newUrl = prompt("Gib den Bild-Link (URL) für dein neues Profilbild ein:", currentUserData?.avatarUrl || "");
             if (newUrl && auth.currentUser) {
                 try {
-                    await updateDoc(doc(db, "users", auth.currentUser.uid), { avatarUrl: newUrl });
+                    await updateDoc(doc(db, "users", auth.currentUser.uid), {
+                        avatarUrl: newUrl
+                    });
                     currentUserData.avatarUrl = newUrl;
                     updateHeaderUI(true);
                     selectLevel(0);
@@ -941,6 +555,211 @@
                 }
             }
         };
+
+        window.currentTab = "classic";
+
+        const demons = [
+            {
+                rank: 1,
+                name: "Tung Tung Tung Sahurcles",
+                difficulty: "Extreme Demon",
+                difficultyIcon: "extreme.jpg",
+                publisher: "ArraegenGD",
+                creator: "ArraegenGD",
+                myVerifier: "Derlery5",        
+                originalVerifier: "Nova4664",    
+                victors: ["Player1", "Player2", "Player3"],
+                youtubeId: "JCAOQQu4Iy0",   
+                description: "Tripple T"
+            },
+            {
+                rank: 2,
+                name: "Cataclysm",
+                difficulty: "Extreme Demon",
+                difficultyIcon: "extreme.jpg",
+                publisher: "Ggb0y",
+                creator: "Ggb0y",
+                myVerifier: "Derlery5",        
+                originalVerifier: "Riot",    
+                victors: ["Player1", "Player2", "Player3"],
+                youtubeId: "Kd-G_pd3OPw",   
+                description: "~6200 Attempts."
+            },
+            {
+                rank: 3,
+                name: "Sweather Weather",
+                difficulty: "Extreme Demon",
+                difficultyIcon: "extreme.jpg",
+                publisher: "VelYT",
+                creator: "VelYT",
+                myVerifier: "Limbu",
+                originalVerifier: "Xfire",
+                victors: ["Player 1", "Player 2"],
+                youtubeId: "7CZFG9oisPI",
+                description: "Deep Level"
+            },
+            {
+                rank: 4,
+                name: "ACU",
+                difficulty: "Extreme Demon",
+                difficultyIcon: "extreme.jpg",
+                publisher: "neigefeu",
+                creator: "neigefeu",
+                myVerifier: "Derlery5",
+                originalVerifier: "neigefeu",
+                victors: ["Limbu"],
+                youtubeId: "riMBe0u4FpU",
+                description: "Einfachster Extreme."
+            },
+            {
+                rank: 5,
+                name: "Poltergeist",
+                difficulty: "Insane Demon",
+                difficultyIcon: "insane.png",
+                publisher: "Andromeda",
+                creator: "Andromeda",
+                myVerifier: "Derlery5",        
+                originalVerifier: "Andromeda",    
+                victors: ["Player1", "Player2", "Player3"],
+                youtubeId: "uUP6l68Tsg0",   
+                description: "Cooles Level"
+            },
+            {
+                rank: 6,
+                name: "Inane Demon",
+                difficulty: "Insane Demon",
+                difficultyIcon: "insane.png",
+                publisher: "KiwiPenguin",
+                creator: "KiwiPenguin",
+                myVerifier: "Derlery5",        
+                originalVerifier: "KiwiPenguin",    
+                victors: ["Player1", "Player2", "Player3"],
+                youtubeId: "OjRwvdtjuqE",   
+                description: "Funny April Joke"
+            },
+            {
+                rank: 7,
+                name: "Stalemate",
+                difficulty: "Insane Demon",
+                difficultyIcon: "insane.png",
+                publisher: "Nox",
+                creator: "Nox",
+                myVerifier: "Derlery5",        
+                originalVerifier: "Nox",    
+                victors: ["Player1", "Player2", "Player3"],
+                youtubeId: "h0ePMjhnUNI",   
+                description: "1.9"
+            },
+            {
+                rank: 8,
+                name: "Windy Landscape",
+                difficulty: "Insane Demon",
+                difficultyIcon: "insane.png",
+                publisher: "WOOGI1411",
+                creator: "WOOGI1411",
+                myVerifier: "Derlery5",        
+                originalVerifier: "GuitarHeroStyles",    
+                victors: ["Player1", "Player2", "Player3"],
+                youtubeId: "UWUmUDGY31k",   
+                description: "Ikonisch"
+            },
+            {
+                rank: 9,
+                name: "CraZy",
+                difficulty: "Insane Demon",
+                difficultyIcon: "insane.png",
+                publisher: "DavJT",
+                creator: "DavJT",
+                myVerifier: "Derlery5",        
+                originalVerifier: "DavJT",    
+                victors: ["Player1", "Player2", "Player3"],
+                youtubeId: "InQNiq9IKxA",   
+                description: "Tuff"
+            },
+            {
+                rank: 10,
+                name: "CraZy II",
+                difficulty: "Insane Demon",
+                difficultyIcon: "insane.png",
+                publisher: "DavJT",
+                creator: "DavJT & N R G",
+                myVerifier: "Derlery5",        
+                originalVerifier: "DavJT",    
+                victors: ["Player1", "Player2", "Player3"],
+                youtubeId: "A1YYMgkAzWI",   
+                description: "Tuff II"
+            },
+            {
+                rank: 11,
+                name: "Skelletal Shenanigans",
+                difficulty: "Hard Demon",
+                difficultyIcon: "hard.webp",
+                publisher: "YoReid",
+                creator: "YoReid & Airzyy",
+                myVerifier: "qChrc",        
+                originalVerifier: "YoReid",    
+                victors: ["Derlery5"],
+                youtubeId: "",   
+                description: "New Hardest"
+            },
+            {
+                rank: 12,
+                name: "KATAMARI",
+                difficulty: "Hard Demon",
+                difficultyIcon: "hard.webp",
+                publisher: "MonkeyInABowl",
+                creator: "MonkeyInABowl",
+                myVerifier: "Derlery5",        
+                originalVerifier: "MonkeyInABowl",    
+                victors: ["Player1", "Player2", "Player3"],
+                youtubeId: "XD-wZE7MMKE",   
+                description: "Bruh"
+            },
+            {
+                rank: 13,
+                name: "Shiver",
+                difficulty: "Easy Demon",
+                difficultyIcon: "easy.webp",
+                publisher: "SpKale",
+                creator: "SpKale",
+                myVerifier: "Ihia",        
+                originalVerifier: "SpKale",    
+                victors: ["Player1", "Player2", "Player3"],
+                youtubeId: "",   
+                description: "Erster EZ Demon"
+            },
+        ];
+
+        const players = [
+            {
+                placement: 1,
+                name: "Derlery5",
+                currentHardest: "Tung Tung Tung Sahurcles",
+                points: 101,
+                beatenExtremes: ["Tung Tung Tung Sahurcles", "Cataclysm", "ACU"]
+            },
+            {
+                placement: 2,
+                name: "Limbu",
+                currentHardest: "Sweather Weather",
+                points: 30,
+                beatenExtremes: ["Sweather Weather", "ACU"]
+            },
+            {
+                placement: 3,
+                name: "qChrc",
+                currentHardest: "Skelletal Shenanigans",
+                points: 1,
+                beatenExtremes: []
+            },
+            {
+                placement: 4,
+                name: "Ihia",
+                currentHardest: "Shiver",
+                points: 1,
+                beatenExtremes: []
+            }
+        ];
 
         window.switchTab = function(tab) {
             window.currentTab = tab;
@@ -987,31 +806,23 @@
             if (window.currentTab === "profile") {
                 const username = currentUserData?.username || "Player";
                 const matchingPlayer = players.find(p => p.name.toLowerCase() === username.toLowerCase()) || {
-                    placement: "-", points: 0, currentHardest: "-", beatenExtremes: []
+                    placement: "-",
+                    points: 0,
+                    currentHardest: "-",
+                    beatenExtremes: []
                 };
-
-                const ownerPanelHTML = isUserOwner() ? `
-                    <div class="admin-manage-box">
-                        <h3 style="color: #ff6b00; margin-bottom: 10px;">Owner Panel: Admin Management</h3>
-                        <div style="display: flex; gap: 10px; align-items: center;">
-                            <input type="text" id="admin-promote-input" placeholder="Ingame Username" style="padding: 8px; background: #121318; border: 1px solid #2a2c3a; color: white; border-radius: 6px; flex-grow: 1;">
-                            <button class="btn-primary" style="width: auto; margin: 0;" onclick="window.promoteToAdmin()">Make Admin</button>
-                            <button class="btn-secondary" style="width: auto; margin: 0; color: #ff4d4d; border-color: #ff4d4d;" onclick="window.demoteAdmin()">Remove Admin</button>
-                        </div>
-                    </div>
-                ` : '';
 
                 detailsContainer.innerHTML = `
                     <div style="margin-bottom: 15px;">
-                        <button class="btn-secondary" style="width: auto; padding: 6px 12px; font-size: 13px;" onclick="window.switchTab('classic')">← Back to List</button>
+                        <button class="btn-secondary" style="width: auto; padding: 6px 12px; font-size: 13px;" onclick="switchTab('classic')">← Back to List</button>
                     </div>
 
                     <img src="${currentUserData?.avatarUrl || DEFAULT_AVATAR}" class="profile-avatar-large" alt="Avatar">
                     <h1 class="level-title" style="text-align: center;">${username}</h1>
-                    <p class="description" style="text-align: center;">My Profile ${isUserAdmin() ? '(Admin/Owner)' : ''}</p>
+                    <p class="description" style="text-align: center;">My Profile</p>
 
                     <div style="text-align: center; margin-bottom: 20px;">
-                        <button class="btn-primary" style="width: auto; padding: 6px 15px; font-size: 13px;" onclick="window.updateAvatarUrl()">Change Profile Picture</button>
+                        <button class="btn-primary" style="width: auto; padding: 6px 15px; font-size: 13px;" onclick="updateAvatarUrl()">Change Profile Picture</button>
                     </div>
 
                     <div class="info-card" style="margin: 0 auto;">
@@ -1033,22 +844,14 @@
                         </div>
                     </div>
 
-                    ${ownerPanelHTML}
-
                     <div style="text-align: center; margin-top: 25px;">
-                        <button class="btn-secondary" style="width: auto; padding: 8px 20px; color: #ff4d4d; border-color: #ff4d4d;" onclick="window.handleLogout()">Log Out</button>
+                        <button class="btn-secondary" style="width: auto; padding: 8px 20px; color: #ff4d4d; border-color: #ff4d4d;" onclick="handleLogout()">Log Out</button>
                     </div>
                 `;
             } else if (window.currentTab === "classic") {
                 const demon = demons[index];
-                if (!demon) return;
-                const editButtonHTML = isUserAdmin() ? `<button class="btn-edit" onclick="window.openEditModal(${index})">✏️ Edit Level</button>` : '';
-
                 detailsContainer.innerHTML = `
-                    <div class="level-title-container">
-                        <h1 class="level-title">#${demon.rank} - ${demon.name}</h1>
-                        ${editButtonHTML}
-                    </div>
+                    <h1 class="level-title">#${demon.rank} - ${demon.name}</h1>
                     <p class="description">${demon.description}</p>
                     
                     <div class="video-container">
@@ -1060,7 +863,7 @@
                             <span class="info-label">Difficulty:</span>
                             <span class="info-value">
                                 <img src="${demon.difficultyIcon}" alt="${demon.difficulty}" class="difficulty-icon">
-                                ${demon.difficulty} (Tier ${demon.tier || 1})
+                                ${demon.difficulty}
                             </span>
                         </div>
                         <div class="info-row">
@@ -1073,7 +876,7 @@
                         </div>
                         <div class="info-row">
                             <span class="info-label">Verifier:</span>
-                            <span class="info-value ${demon.myVerifier.toLowerCase() === 'qchrc' ? 'highlight-name' : ''}">${demon.myVerifier}</span>
+                            <span class="info-value ${demon.myVerifier === 'Derlery5' ? 'highlight-name' : ''}">${demon.myVerifier}</span>
                         </div>
                         <div class="info-row">
                             <span class="info-label">Original Verifier:</span>
@@ -1081,20 +884,14 @@
                         </div>
                         <div class="info-row">
                             <span class="info-label">Other Victors:</span>
-                            <span class="info-value">${demon.victors && demon.victors.length > 0 ? demon.victors.join(", ") : "Keine"}</span>
+                            <span class="info-value">${demon.victors.join(", ")}</span>
                         </div>
                     </div>
                 `;
             } else {
                 const player = players[index];
-                if (!player) return;
-                const editPlayerButtonHTML = isUserAdmin() ? `<button class="btn-edit" onclick="window.openEditPlayerModal(${index})">✏️ Edit Player</button>` : '';
-
                 detailsContainer.innerHTML = `
-                    <div class="level-title-container">
-                        <h1 class="level-title">#${player.placement} - ${player.name}</h1>
-                        ${editPlayerButtonHTML}
-                    </div>
+                    <h1 class="level-title">#${player.placement} - ${player.name}</h1>
                     <p class="description">Player Profile</p>
 
                     <div class="info-card">
@@ -1132,7 +929,7 @@
             });
         };
 
-        window.onload = loadDataFromFirestore;
+        window.onload = loadLevelList;
     </script>
 </body>
 </html>
