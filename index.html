@@ -482,15 +482,15 @@
             onSnapshot
         } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // Helper Funktion zum Extrahieren der reinen YouTube Video-ID aus Links oder reinen IDs
+        // Hilfsfunktion zum Extrahieren der YouTube Video-ID
         function extractYouTubeId(urlOrId) {
             if (!urlOrId) return "";
-            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-            const match = urlOrId.match(regExp);
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|shorts\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = urlOrId.trim().match(regExp);
             return (match && match[2].length === 11) ? match[2] : urlOrId.trim();
         }
 
-        // Fallback Initial Data
+        // Standard-Fallbackdaten
         const initialDemons = [
             { rank: 1, name: "Tung Tung Tung Sahurcles", difficulty: "Extreme Demon", tier: 10, publisher: "ArraegenGD", creator: "ArraegenGD", myVerifier: "Derlery5", originalVerifier: "Nova4664", victors: ["Player1", "Player2"], youtubeId: "JCAOQQu4Iy0", description: "Tripple T" },
             { rank: 2, name: "Cataclysm", difficulty: "Extreme Demon", tier: 3, publisher: "Ggb0y", creator: "Ggb0y", myVerifier: "Derlery5", originalVerifier: "Riot", victors: ["Player1"], youtubeId: "Kd-G_pd3OPw", description: "~6200 Attempts." },
@@ -551,7 +551,7 @@
 
         window.currentTab = "classic";
 
-        // Window Bindings für HTML OnClick Handlers
+        // Global Handlers
         window.switchTab = function(tab) {
             window.currentTab = tab;
             document.getElementById("tab-classic").classList.toggle("active", tab === "classic");
@@ -686,11 +686,15 @@
             }
         };
 
+        // VOLLSTÄNDIGES BEISPIEL FÜR ANNAHME EINES LEVELS (SPEICHERT DIREKT IN FIRESTORE)
         window.approveSubmission = async function(subId) {
             const sub = submissions.find(s => s.id === subId);
             if (!sub) return;
 
             const rank = parseInt(document.getElementById("approve-rank").value) || 1;
+            const cleanYt = extractYouTubeId(sub.youtubeId);
+
+            // 1. Prüfen, ob das Level bereits in der Liste existiert
             const existingDemonIndex = demons.findIndex(d => d.name.toLowerCase() === sub.name.toLowerCase());
 
             if (existingDemonIndex !== -1) {
@@ -699,8 +703,11 @@
                     demons[existingDemonIndex].victors.push(sub.myVerifier);
                 }
             } else {
+                // Ränge aller nachfolgenden Level anpassen
                 demons.forEach(d => {
-                    if (d.rank >= rank) d.rank += 1;
+                    if (d.rank >= rank) {
+                        d.rank += 1;
+                    }
                 });
 
                 const newDemon = {
@@ -713,12 +720,16 @@
                     myVerifier: sub.myVerifier,
                     originalVerifier: sub.originalVerifier,
                     victors: [],
-                    youtubeId: extractYouTubeId(sub.youtubeId),
-                    description: sub.description
+                    youtubeId: cleanYt,
+                    description: sub.description || ""
                 };
                 demons.push(newDemon);
             }
 
+            // 2. Ränge aufsteigend sortieren
+            demons.sort((a, b) => a.rank - b.rank);
+
+            // 3. Verifizierer/Spieler eintragen falls neu
             let playerExists = players.some(p => p.name.toLowerCase() === sub.myVerifier.toLowerCase());
             if (!playerExists) {
                 players.push({
@@ -730,12 +741,20 @@
                 });
             }
 
-            await saveDemonsToDb();
-            await savePlayersToDb();
-            await deleteDoc(doc(db, "submissions", subId));
+            try {
+                // 4. In Firestore-Datenbank dauerhaft speichern
+                await saveDemonsToDb();
+                await savePlayersToDb();
 
-            alert("Level erfolgreich akzeptiert und eingeordnet!");
-            switchTab("classic");
+                // 5. Einreichung löschen
+                await deleteDoc(doc(db, "submissions", subId));
+
+                alert("Level erfolgreich akzeptiert und für JEDEN sichtbar gespeichert!");
+                switchTab("classic");
+            } catch (error) {
+                console.error("Fehler beim Speichern:", error);
+                alert("Fehler beim Speichern in der Datenbank: " + error.message);
+            }
         };
 
         window.rejectSubmission = async function(subId) {
@@ -857,7 +876,7 @@
             document.getElementById("edit-modal").classList.remove("active");
         };
 
-        // Interner Zustand & Auth Listener
+        // Firebase Auth Listener
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 const userDoc = await getDoc(doc(db, "users", user.uid));
@@ -1192,11 +1211,10 @@
                 
                 <div class="video-container">
                     <iframe 
-    src="https://www.youtube-nocookie.com/embed/${cleanYtId}" 
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-    referrerpolicy="strict-origin-when-cross-origin" 
-    allowfullscreen>
-</iframe>
+                        src="https://www.youtube.com/embed/${cleanYtId}" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                        allowfullscreen>
+                    </iframe>
                 </div>
 
                 <div class="info-card">
@@ -1300,7 +1318,7 @@
             `;
         }
 
-        // System Start
+        // Startpunkt
         initFirestoreListeners();
     </script>
 </body>
