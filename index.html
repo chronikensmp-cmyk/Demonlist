@@ -220,6 +220,10 @@
                     <input type="text" id="edit-orig-verifier" required>
                 </div>
                 <div class="form-group">
+                    <label for="edit-victors">Other Victors (mit Komma trennen)</label>
+                    <input type="text" id="edit-victors" placeholder="z.B. Player1, Player2">
+                </div>
+                <div class="form-group">
                     <label for="edit-youtube">YouTube Video ID</label>
                     <input type="text" id="edit-youtube" required>
                 </div>
@@ -462,7 +466,8 @@
             document.getElementById("edit-publisher").value = demon.publisher;
             document.getElementById("edit-creator").value = demon.creator;
             document.getElementById("edit-verifier").value = demon.myVerifier;
-            document.getElementById("edit-orig-verifier").value = demon.originalVerifier;
+            document.getElementById("edit-orig-verifier").value = demon.originalVerifier || "";
+            document.getElementById("edit-victors").value = demon.victors ? demon.victors.join(", ") : "";
             document.getElementById("edit-youtube").value = demon.youtubeId;
             document.getElementById("edit-description").value = demon.description || "";
 
@@ -491,6 +496,13 @@
 
             const autoTier = getTierByRank(diff, newRank);
 
+            // Other Victors verarbeiten (String in Array umwandeln)
+            const rawVictors = document.getElementById("edit-victors").value;
+            const victorsArray = rawVictors
+                .split(",")
+                .map(v => v.trim())
+                .filter(v => v.length > 0);
+
             const updatedDemon = {
                 ...demons[index],
                 rank: newRank,
@@ -501,6 +513,7 @@
                 creator: document.getElementById("edit-creator").value.trim(),
                 myVerifier: document.getElementById("edit-verifier").value.trim(),
                 originalVerifier: document.getElementById("edit-orig-verifier").value.trim(),
+                victors: victorsArray,
                 youtubeId: document.getElementById("edit-youtube").value.trim(),
                 description: document.getElementById("edit-description").value.trim(),
                 tier: autoTier
@@ -909,7 +922,7 @@
                         </div>
                         <div class="info-row">
                             <span class="info-label">Other Victors:</span>
-                            <span class="info-value">${demon.victors.join(", ")}</span>
+                            <span class="info-value">${demon.victors && demon.victors.length > 0 ? demon.victors.join(", ") : "Keine"}</span>
                         </div>
                     </div>
                 `;
