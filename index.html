@@ -496,7 +496,6 @@
 
             const autoTier = getTierByRank(diff, newRank);
 
-            // Other Victors verarbeiten (String in Array umwandeln)
             const rawVictors = document.getElementById("edit-victors").value;
             const victorsArray = rawVictors
                 .split(",")
@@ -618,51 +617,87 @@
             const sub = pendingSubmissions.find(s => s.id === docId);
             if (!sub) return;
 
-            const rankInput = document.getElementById(`rank-input-${idx}`).value;
-            const targetRank = parseInt(rankInput) || 1;
+            // Prüfe, ob Level bereits in der Demonlist vorhanden ist
+            const existingDemonIndex = demons.findIndex(d => d.name.toLowerCase() === sub.name.toLowerCase());
+            
+            let autoTier;
+            let calculatedPoints;
+            let targetRank;
 
-            const autoTier = getTierByRank(sub.difficulty, targetRank);
-            const calculatedPoints = calculatePoints(sub.difficulty, autoTier);
+            if (existingDemonIndex !== -1) {
+                // FALL 1: Level ist BEREITS auf der Liste
+                const existingDemon = demons[existingDemonIndex];
+                targetRank = existingDemon.rank;
+                autoTier = getTierByRank(existingDemon.difficulty, existingDemon.rank);
+                calculatedPoints = calculatePoints(existingDemon.difficulty, autoTier);
 
-            let diffIcon = "easy.webp";
-            if (sub.difficulty === "Medium Demon") diffIcon = "medium.webp";
-            if (sub.difficulty === "Insane Demon") diffIcon = "insane.png";
-            if (sub.difficulty === "Extreme Demon") diffIcon = "extreme.jpg";
+                if (!existingDemon.victors) {
+                    existingDemon.victors = [];
+                }
 
-            const newDemon = {
-                rank: targetRank,
-                name: sub.name,
-                difficulty: sub.difficulty,
-                difficultyIcon: diffIcon,
-                publisher: sub.publisher,
-                creator: sub.creator,
-                myVerifier: sub.player,
-                originalVerifier: sub.publisher,
-                victors: [sub.player],
-                youtubeId: sub.youtubeId,
-                description: sub.description || "Community Submission",
-                tier: autoTier
-            };
+                // Füge den Spieler zu Other Victors hinzu, falls noch nicht vorhanden
+                const alreadyVictor = existingDemon.victors.some(v => v.toLowerCase() === sub.player.toLowerCase());
+                const isVerifier = existingDemon.myVerifier.toLowerCase() === sub.player.toLowerCase();
 
-            demons.splice(targetRank - 1, 0, newDemon);
-            demons.forEach((d, i) => d.rank = i + 1);
+                if (!alreadyVictor && !isVerifier) {
+                    existingDemon.victors.push(sub.player);
+                }
+
+                alert(`Level "${existingDemon.name}" existiert bereits auf Rang #${targetRank}! ${sub.player} wurde zu den "Other Victors" hinzugefügt (${calculatedPoints} Pkt.).`);
+            } else {
+                // FALL 2: Level ist KOMPLETT NEU
+                const rankInput = document.getElementById(`rank-input-${idx}`).value;
+                targetRank = parseInt(rankInput) || 1;
+
+                autoTier = getTierByRank(sub.difficulty, targetRank);
+                calculatedPoints = calculatePoints(sub.difficulty, autoTier);
+
+                let diffIcon = "easy.webp";
+                if (sub.difficulty === "Medium Demon") diffIcon = "medium.webp";
+                if (sub.difficulty === "Insane Demon") diffIcon = "insane.png";
+                if (sub.difficulty === "Extreme Demon") diffIcon = "extreme.jpg";
+
+                const newDemon = {
+                    rank: targetRank,
+                    name: sub.name,
+                    difficulty: sub.difficulty,
+                    difficultyIcon: diffIcon,
+                    publisher: sub.publisher,
+                    creator: sub.creator,
+                    myVerifier: sub.player,
+                    originalVerifier: sub.publisher,
+                    victors: [],
+                    youtubeId: sub.youtubeId,
+                    description: sub.description || "Community Submission",
+                    tier: autoTier
+                };
+
+                demons.splice(targetRank - 1, 0, newDemon);
+                demons.forEach((d, i) => d.rank = i + 1);
+
+                alert(`Neues Level "${sub.name}" als Platz #${targetRank} genehmigt! (Tier ${autoTier} | ${calculatedPoints} Pkt.)`);
+            }
+
+            // Spieler-Punkte und Records aktualisieren
+            const levelDifficulty = existingDemonIndex !== -1 ? demons[existingDemonIndex].difficulty : sub.difficulty;
+            const levelName = existingDemonIndex !== -1 ? demons[existingDemonIndex].name : sub.name;
 
             let playerObj = players.find(p => p.name.toLowerCase() === sub.player.toLowerCase());
             if (!playerObj) {
                 playerObj = {
                     placement: players.length + 1,
                     name: sub.player,
-                    currentHardest: sub.name,
+                    currentHardest: levelName,
                     points: calculatedPoints,
-                    beatenExtremes: sub.difficulty === "Extreme Demon" ? [sub.name] : []
+                    beatenExtremes: levelDifficulty === "Extreme Demon" ? [levelName] : []
                 };
                 players.push(playerObj);
             } else {
                 playerObj.points += calculatedPoints;
-                if (sub.difficulty === "Extreme Demon" && !playerObj.beatenExtremes.includes(sub.name)) {
-                    playerObj.beatenExtremes.push(sub.name);
+                if (levelDifficulty === "Extreme Demon" && !playerObj.beatenExtremes.includes(levelName)) {
+                    playerObj.beatenExtremes.push(levelName);
                 }
-                playerObj.currentHardest = sub.name;
+                playerObj.currentHardest = levelName;
             }
 
             players.sort((a, b) => b.points - a.points);
@@ -670,7 +705,6 @@
 
             await deleteDoc(doc(db, "submissions", docId));
 
-            alert(`Level "${sub.name}" als Platz #${targetRank} genehmigt! (Tier ${autoTier} | ${calculatedPoints} Pkt.)`);
             loadLevelList();
             openAdminModal();
         };
