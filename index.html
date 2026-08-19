@@ -31,7 +31,6 @@
             }
         }
 
-        /* Sidebar / Liste */
         .sidebar {
             width: 100%;
             background-color: #1a1b23;
@@ -123,7 +122,6 @@
             margin-right: 8px;
         }
 
-        /* Main Layout Header & Content */
         .main-wrapper {
             flex-grow: 1;
             display: flex;
@@ -152,7 +150,6 @@
             color: #fff;
             font-weight: bold;
             font-size: 14px;
-            transition: background-color 0.2s;
         }
 
         .account-btn:hover {
@@ -167,7 +164,6 @@
             background-color: #2a2c3a;
         }
 
-        /* Contentbereich */
         .content {
             flex-grow: 1;
             padding: 20px;
@@ -233,17 +229,11 @@
             gap: 8px;
         }
 
-        .difficulty-icon {
-            height: 24px;
-            width: auto;
-        }
-
         .highlight-name {
             color: #ff6b00;
             font-weight: bold;
         }
 
-        /* Modal Styles */
         .modal {
             display: none;
             position: fixed;
@@ -383,7 +373,6 @@
 <body>
 
     <div class="app-container">
-        <!-- Sidebar -->
         <aside class="sidebar">
             <div class="logo" onclick="switchTab('classic')">
                 <span class="logo-highlight">German</span> Demonlist
@@ -398,7 +387,6 @@
             <ul id="level-list" class="level-list"></ul>
         </aside>
 
-        <!-- Main Wrapper -->
         <div class="main-wrapper">
             <header class="top-header">
                 <div>
@@ -456,7 +444,6 @@
         </div>
     </div>
 
-    <!-- Firebase Script -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { 
@@ -482,7 +469,6 @@
             onSnapshot
         } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // Hilfsfunktion zum Extrahieren der YouTube Video-ID
         function extractYouTubeId(urlOrId) {
             if (!urlOrId) return "";
             const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|shorts\/|watch\?v=|\&v=)([^#\&\?]*).*/;
@@ -490,19 +476,13 @@
             return (match && match[2].length === 11) ? match[2] : urlOrId.trim();
         }
 
-        // Standard-Fallbackdaten
         const initialDemons = [
-            { rank: 1, name: "Tung Tung Tung Sahurcles", difficulty: "Extreme Demon", tier: 10, publisher: "ArraegenGD", creator: "ArraegenGD", myVerifier: "Derlery5", originalVerifier: "Nova4664", victors: ["Player1", "Player2"], youtubeId: "JCAOQQu4Iy0", description: "Tripple T" },
-            { rank: 2, name: "Cataclysm", difficulty: "Extreme Demon", tier: 3, publisher: "Ggb0y", creator: "Ggb0y", myVerifier: "Derlery5", originalVerifier: "Riot", victors: ["Player1"], youtubeId: "Kd-G_pd3OPw", description: "~6200 Attempts." },
-            { rank: 3, name: "Sweather Weather", difficulty: "Extreme Demon", tier: 3, publisher: "VelYT", creator: "VelYT", myVerifier: "Limbu", originalVerifier: "Xfire", victors: ["Player 1"], youtubeId: "7CZFG9oisPI", description: "Deep Level" },
-            { rank: 4, name: "ACU", difficulty: "Extreme Demon", tier: 1, publisher: "neigefeu", creator: "neigefeu", myVerifier: "Derlery5", originalVerifier: "neigefeu", victors: ["Limbu"], youtubeId: "riMBe0u4FpU", description: "Einfachster Extreme." }
+            { rank: 1, name: "Tung Tung Tung Sahurcles", difficulty: "Extreme Demon", tier: 10, enjoyment: "90%", publisher: "ArraegenGD", creator: "ArraegenGD", myVerifier: "Derlery5", originalVerifier: "Nova4664", victors: ["Player1", "Player2"], youtubeId: "JCAOQQu4Iy0", description: "Tripple T" },
+            { rank: 2, name: "Cataclysm", difficulty: "Extreme Demon", tier: 3, enjoyment: "75%", publisher: "Ggb0y", creator: "Ggb0y", myVerifier: "Derlery5", originalVerifier: "Riot", victors: ["Player1"], youtubeId: "Kd-G_pd3OPw", description: "~6200 Attempts." }
         ];
 
         const initialPlayers = [
-            { placement: 1, name: "Derlery5", currentHardest: "Tung Tung Tung Sahurcles", points: 0, beatenExtremes: [] },
-            { placement: 2, name: "Limbu", currentHardest: "Sweather Weather", points: 0, beatenExtremes: [] },
-            { placement: 3, name: "qChrc", currentHardest: "Skelletal Shenanigans", points: 0, beatenExtremes: [] },
-            { placement: 4, name: "Ihia", currentHardest: "Shiver", points: 0, beatenExtremes: [] }
+            { placement: 1, name: "Derlery5", currentHardest: "Tung Tung Tung Sahurcles", points: 0, beatenExtremes: [] }
         ];
 
         const firebaseConfig = {
@@ -522,6 +502,7 @@
         const DEFAULT_AVATAR = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23888888'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/></svg>";
         const OWNER_NAME = "qChrc";
 
+        // VORLAGE: Punktsystem mit Basiswert x Tier-Multiplikator
         const BASE_VALUES = {
             "Easy Demon": 1,
             "Medium Demon": 2,
@@ -551,7 +532,6 @@
 
         window.currentTab = "classic";
 
-        // Global Handlers
         window.switchTab = function(tab) {
             window.currentTab = tab;
             document.getElementById("tab-classic").classList.toggle("active", tab === "classic");
@@ -564,11 +544,8 @@
         };
 
         window.handleAccountClick = function() {
-            if (auth.currentUser) {
-                switchTab('profile');
-            } else {
-                openAuthModal();
-            }
+            if (auth.currentUser) switchTab('profile');
+            else openAuthModal();
         };
 
         window.openAuthModal = function() {
@@ -596,8 +573,6 @@
             const remember = document.getElementById("auth-remember").checked;
             const errorElement = document.getElementById("auth-error");
 
-            errorElement.style.display = "none";
-
             try {
                 const persistence = remember ? browserLocalPersistence : browserSessionPersistence;
                 await setPersistence(auth, persistence);
@@ -605,19 +580,13 @@
                 if (isRegisterMode) {
                     const username = document.getElementById("auth-username").value.trim() || email.split("@")[0];
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                    const user = userCredential.user;
-
                     const role = username === OWNER_NAME ? "owner" : "user";
-                    await setDoc(doc(db, "users", user.uid), {
-                        username: username,
-                        avatarUrl: DEFAULT_AVATAR,
-                        role: role,
-                        createdAt: new Date().toISOString()
+                    await setDoc(doc(db, "users", userCredential.user.uid), {
+                        username: username, avatarUrl: DEFAULT_AVATAR, role: role, createdAt: new Date().toISOString()
                     });
                 } else {
                     await signInWithEmailAndPassword(auth, email, password);
                 }
-
                 window.closeAuthModal();
             } catch (error) {
                 errorElement.textContent = error.message;
@@ -628,22 +597,6 @@
         window.handleLogout = async function() {
             await signOut(auth);
             switchTab('classic');
-        };
-
-        window.updateAvatarUrl = async function() {
-            const newUrl = prompt("Gib den Bild-Link (URL) für dein neues Profilbild ein:", currentUserData?.avatarUrl || "");
-            if (newUrl && auth.currentUser) {
-                try {
-                    await updateDoc(doc(db, "users", auth.currentUser.uid), {
-                        avatarUrl: newUrl
-                    });
-                    currentUserData.avatarUrl = newUrl;
-                    updateHeaderUI(true);
-                    selectLevel(0);
-                } catch (e) {
-                    alert("Fehler beim Speichern des Profilbilds: " + e.message);
-                }
-            }
         };
 
         window.filterLevels = function() {
@@ -659,19 +612,19 @@
             });
         };
 
+        // SUBMIT FORMULAR: Nun ohne Tier, dafür mit Geschätztem Rang & Enjoyment
         window.handleLevelSubmission = async function(e) {
             e.preventDefault();
-            const rawYtInput = document.getElementById("sub-yt").value;
-
             const newSub = {
                 name: document.getElementById("sub-name").value.trim(),
                 difficulty: document.getElementById("sub-diff").value,
-                tier: parseInt(document.getElementById("sub-tier").value),
+                estimatedRank: parseInt(document.getElementById("sub-est-rank").value) || 1,
+                enjoyment: document.getElementById("sub-enjoyment").value.trim() + "%",
                 publisher: document.getElementById("sub-publisher").value.trim(),
                 creator: document.getElementById("sub-creator").value.trim(),
                 myVerifier: document.getElementById("sub-verifier").value.trim(),
                 originalVerifier: document.getElementById("sub-orig-verifier").value.trim(),
-                youtubeId: extractYouTubeId(rawYtInput),
+                youtubeId: extractYouTubeId(document.getElementById("sub-yt").value),
                 description: document.getElementById("sub-desc").value.trim(),
                 submittedBy: currentUserData?.username || "Unknown",
                 createdAt: new Date().toISOString()
@@ -679,22 +632,21 @@
 
             try {
                 await addDoc(collection(db, "submissions"), newSub);
-                alert("Einreichung erfolgreich abgesendet! Admins werden dein Level prüfen.");
+                alert("Einreichung gesendet! Admins werden deinen Vorschlag prüfen.");
                 switchTab("classic");
             } catch (err) {
                 alert("Fehler beim Einreichen: " + err.message);
             }
         };
 
-        // VOLLSTÄNDIGES BEISPIEL FÜR ANNAHME EINES LEVELS (SPEICHERT DIREKT IN FIRESTORE)
+        // ADMIN BESTÄTIGUNG: Rang UND Tier festlegen
         window.approveSubmission = async function(subId) {
             const sub = submissions.find(s => s.id === subId);
             if (!sub) return;
 
-            const rank = parseInt(document.getElementById("approve-rank").value) || 1;
-            const cleanYt = extractYouTubeId(sub.youtubeId);
+            const finalRank = parseInt(document.getElementById("approve-rank").value) || 1;
+            const finalTier = parseInt(document.getElementById("approve-tier").value) || 1;
 
-            // 1. Prüfen, ob das Level bereits in der Liste existiert
             const existingDemonIndex = demons.findIndex(d => d.name.toLowerCase() === sub.name.toLowerCase());
 
             if (existingDemonIndex !== -1) {
@@ -703,35 +655,27 @@
                     demons[existingDemonIndex].victors.push(sub.myVerifier);
                 }
             } else {
-                // Ränge aller nachfolgenden Level anpassen
-                demons.forEach(d => {
-                    if (d.rank >= rank) {
-                        d.rank += 1;
-                    }
-                });
-
-                const newDemon = {
-                    rank: rank,
+                demons.forEach(d => { if (d.rank >= finalRank) d.rank += 1; });
+                demons.push({
+                    rank: finalRank,
                     name: sub.name,
                     difficulty: sub.difficulty,
-                    tier: sub.tier,
+                    tier: finalTier,
+                    enjoyment: sub.enjoyment || "N/A",
                     publisher: sub.publisher,
                     creator: sub.creator,
                     myVerifier: sub.myVerifier,
                     originalVerifier: sub.originalVerifier,
                     victors: [],
-                    youtubeId: cleanYt,
+                    youtubeId: extractYouTubeId(sub.youtubeId),
                     description: sub.description || ""
-                };
-                demons.push(newDemon);
+                });
             }
 
-            // 2. Ränge aufsteigend sortieren
             demons.sort((a, b) => a.rank - b.rank);
 
-            // 3. Verifizierer/Spieler eintragen falls neu
-            let playerExists = players.some(p => p.name.toLowerCase() === sub.myVerifier.toLowerCase());
-            if (!playerExists) {
+            let player = players.find(p => p.name.toLowerCase() === sub.myVerifier.toLowerCase());
+            if (!player) {
                 players.push({
                     placement: players.length + 1,
                     name: sub.myVerifier,
@@ -741,55 +685,36 @@
                 });
             }
 
+            recalculatePlayerScores();
+
             try {
-                // 4. In Firestore-Datenbank dauerhaft speichern
                 await saveDemonsToDb();
                 await savePlayersToDb();
-
-                // 5. Einreichung löschen
                 await deleteDoc(doc(db, "submissions", subId));
 
-                alert("Level erfolgreich akzeptiert und für JEDEN sichtbar gespeichert!");
+                alert("Level freigegeben und gespeichert!");
                 switchTab("classic");
             } catch (error) {
-                console.error("Fehler beim Speichern:", error);
-                alert("Fehler beim Speichern in der Datenbank: " + error.message);
+                alert("Fehler beim Speichern: " + error.message);
             }
         };
 
         window.rejectSubmission = async function(subId) {
-            if (confirm("Möchtest du diese Einreichung wirklich ablehnen?")) {
+            if (confirm("Einreichung ablehnen?")) {
                 await deleteDoc(doc(db, "submissions", subId));
-                alert("Einreichung abgelehnt.");
                 switchTab("pending");
             }
         };
 
-        window.changeUserRole = async function(targetRole) {
-            const username = document.getElementById("manage-role-username").value.trim();
-            if (!username) return alert("Bitte Ingame-Namen eingeben.");
-
-            const usersSnap = await getDocs(collection(db, "users"));
-            let foundUserDoc = null;
-
-            usersSnap.forEach(d => {
-                if (d.data().username && d.data().username.toLowerCase() === username.toLowerCase()) {
-                    foundUserDoc = d;
-                }
-            });
-
-            if (foundUserDoc) {
-                await updateDoc(doc(db, "users", foundUserDoc.id), { role: targetRole });
-                alert(`Rolle von ${username} wurde auf '${targetRole}' aktualisiert.`);
-            } else {
-                alert("Benutzer nicht in Firestore gefunden.");
-            }
-        };
-
+        // EDIT DEMON (NUR OWNER DARF ENJOYMENT ANPASSEN)
         window.openEditDemonModal = function(index) {
             const d = demons[index];
             const container = document.getElementById("edit-form-container");
             document.getElementById("edit-modal-title").textContent = "Edit Demon: " + d.name;
+
+            const ownerOnlyEnjoymentField = isUserOwner() 
+                ? `<div class="form-group"><label>Enjoyment Rating (NUR OWNER EDITIERBAR)</label><input type="text" id="edit-d-enjoyment" value="${d.enjoyment || ''}"></div>`
+                : `<div class="form-group"><label>Enjoyment Rating (Nur Owner)</label><input type="text" value="${d.enjoyment || ''}" disabled style="opacity:0.6;"></div>`;
 
             container.innerHTML = `
                 <div class="form-group"><label>Rank</label><input type="number" id="edit-d-rank" value="${d.rank}"></div>
@@ -804,11 +729,12 @@
                         ${[1,2,3,4,5,6,7,8,9,10].map(t => `<option value="${t}" ${(d.tier||1) == t ? 'selected' : ''}>Tier ${t}</option>`).join("")}
                     </select>
                 </div>
+                ${ownerOnlyEnjoymentField}
                 <div class="form-group"><label>Publisher</label><input type="text" id="edit-d-publisher" value="${d.publisher}"></div>
                 <div class="form-group"><label>Creator</label><input type="text" id="edit-d-creator" value="${d.creator}"></div>
                 <div class="form-group"><label>Verifier</label><input type="text" id="edit-d-verifier" value="${d.myVerifier}"></div>
                 <div class="form-group"><label>Original Verifier</label><input type="text" id="edit-d-orig" value="${d.originalVerifier}"></div>
-                <div class="form-group"><label>Other Victors (Kommagetrennt)</label><input type="text" id="edit-d-victors" value="${(d.victors||[]).join(", ")}"></div>
+                <div class="form-group"><label>Victors (kommagetrennt)</label><input type="text" id="edit-d-victors" value="${(d.victors||[]).join(", ")}"></div>
                 <div class="form-group"><label>YouTube Link or ID</label><input type="text" id="edit-d-yt" value="${d.youtubeId}"></div>
                 <button class="btn-primary" onclick="saveDemonEdits(${index})">Save Changes</button>
                 <button class="btn-danger" style="width:100%; margin-bottom:10px;" onclick="deleteDemon(${index})">Delete Level</button>
@@ -821,6 +747,11 @@
             demons[index].name = document.getElementById("edit-d-name").value.trim();
             demons[index].difficulty = document.getElementById("edit-d-diff").value;
             demons[index].tier = parseInt(document.getElementById("edit-d-tier").value);
+            
+            if (isUserOwner() && document.getElementById("edit-d-enjoyment")) {
+                demons[index].enjoyment = document.getElementById("edit-d-enjoyment").value.trim();
+            }
+
             demons[index].publisher = document.getElementById("edit-d-publisher").value.trim();
             demons[index].creator = document.getElementById("edit-d-creator").value.trim();
             demons[index].myVerifier = document.getElementById("edit-d-verifier").value.trim();
@@ -828,45 +759,21 @@
             
             const victorsStr = document.getElementById("edit-d-victors").value;
             demons[index].victors = victorsStr.split(",").map(v => v.trim()).filter(v => v.length > 0);
-            
             demons[index].youtubeId = extractYouTubeId(document.getElementById("edit-d-yt").value);
 
+            recalculatePlayerScores();
             await saveDemonsToDb();
-            window.closeEditModal();
-        };
-
-        window.deleteDemon = async function(index) {
-            if (confirm("Level wirklich löschen?")) {
-                demons.splice(index, 1);
-                demons.sort((a,b) => a.rank - b.rank);
-                demons.forEach((d, i) => d.rank = i + 1);
-                await saveDemonsToDb();
-                window.closeEditModal();
-            }
-        };
-
-        window.openEditPlayerModal = function(index) {
-            const p = players[index];
-            const container = document.getElementById("edit-form-container");
-            document.getElementById("edit-modal-title").textContent = "Edit Player: " + p.name;
-
-            container.innerHTML = `
-                <div class="form-group"><label>Name</label><input type="text" id="edit-p-name" value="${p.name}"></div>
-                <button class="btn-primary" onclick="savePlayerEdits(${index})">Save Changes</button>
-                <button class="btn-danger" style="width:100%; margin-bottom:10px;" onclick="deletePlayer(${index})">Delete Player</button>
-            `;
-            document.getElementById("edit-modal").classList.add("active");
-        };
-
-        window.savePlayerEdits = async function(index) {
-            players[index].name = document.getElementById("edit-p-name").value.trim();
             await savePlayersToDb();
             window.closeEditModal();
         };
 
-        window.deletePlayer = async function(index) {
-            if (confirm("Spieler wirklich löschen?")) {
-                players.splice(index, 1);
+        window.deleteDemon = async function(index) {
+            if (confirm("Level löschen?")) {
+                demons.splice(index, 1);
+                demons.sort((a,b) => a.rank - b.rank);
+                demons.forEach((d, i) => d.rank = i + 1);
+                recalculatePlayerScores();
+                await saveDemonsToDb();
                 await savePlayersToDb();
                 window.closeEditModal();
             }
@@ -876,21 +783,14 @@
             document.getElementById("edit-modal").classList.remove("active");
         };
 
-        // Firebase Auth Listener
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 const userDoc = await getDoc(doc(db, "users", user.uid));
                 if (userDoc.exists()) {
                     currentUserData = userDoc.data();
-                    if (currentUserData.username === OWNER_NAME) {
-                        currentUserData.role = "owner";
-                    }
+                    if (currentUserData.username === OWNER_NAME) currentUserData.role = "owner";
                 } else {
-                    currentUserData = {
-                        username: user.email.split("@")[0],
-                        avatarUrl: DEFAULT_AVATAR,
-                        role: user.email.split("@")[0] === OWNER_NAME ? "owner" : "user"
-                    };
+                    currentUserData = { username: user.email.split("@")[0], avatarUrl: DEFAULT_AVATAR, role: "user" };
                 }
                 updateHeaderUI(true);
             } else {
@@ -909,12 +809,7 @@
         }
 
         function toggleAdminTabs() {
-            const pendingBtn = document.getElementById("tab-pending");
-            if (isUserAdmin()) {
-                pendingBtn.style.display = "inline-block";
-            } else {
-                pendingBtn.style.display = "none";
-            }
+            document.getElementById("tab-pending").style.display = isUserAdmin() ? "inline-block" : "none";
         }
 
         function updateHeaderUI(isLoggedIn) {
@@ -933,9 +828,7 @@
                     badge.textContent = "ADMIN";
                     badge.className = "badge badge-admin";
                     badge.style.display = "inline-block";
-                } else {
-                    badge.style.display = "none";
-                }
+                } else badge.style.display = "none";
             } else {
                 avatar.src = DEFAULT_AVATAR;
                 name.textContent = "Log In / Register";
@@ -945,30 +838,22 @@
 
         function initFirestoreListeners() {
             onSnapshot(doc(db, "listdata", "demons"), (snapshot) => {
-                if (snapshot.exists() && snapshot.data().list) {
-                    demons = snapshot.data().list;
-                } else {
-                    demons = initialDemons;
-                }
+                if (snapshot.exists() && snapshot.data().list) demons = snapshot.data().list;
+                else demons = initialDemons;
                 recalculatePlayerScores();
                 loadLevelList();
             });
 
             onSnapshot(doc(db, "listdata", "players"), (snapshot) => {
-                if (snapshot.exists() && snapshot.data().list) {
-                    players = snapshot.data().list;
-                } else {
-                    players = initialPlayers;
-                }
+                if (snapshot.exists() && snapshot.data().list) players = snapshot.data().list;
+                else players = initialPlayers;
                 recalculatePlayerScores();
                 loadLevelList();
             });
 
             onSnapshot(collection(db, "submissions"), (snapshot) => {
                 submissions = [];
-                snapshot.forEach((doc) => {
-                    submissions.push({ id: doc.id, ...doc.data() });
-                });
+                snapshot.forEach(doc => submissions.push({ id: doc.id, ...doc.data() }));
                 if (window.currentTab === "pending") loadLevelList();
             });
         }
@@ -996,13 +881,8 @@
                     const isVictor = demon.victors && demon.victors.some(v => v.toLowerCase() === player.name.toLowerCase());
 
                     if (isVerifier || isVictor) {
-                        const demonScore = calculateScore(demon.difficulty, demon.tier || 1);
-                        pts += demonScore;
-
-                        if (demon.difficulty === "Extreme Demon") {
-                            beatenExtremes.push(demon.name);
-                        }
-
+                        pts += calculateScore(demon.difficulty, demon.tier || 1);
+                        if (demon.difficulty === "Extreme Demon") beatenExtremes.push(demon.name);
                         if (demon.rank < hardestRank) {
                             hardestRank = demon.rank;
                             hardestDemon = demon.name;
@@ -1029,10 +909,7 @@
                 return;
             }
 
-            let data = [];
-            if (window.currentTab === "classic") data = demons;
-            else if (window.currentTab === "players") data = players;
-            else if (window.currentTab === "pending") data = submissions;
+            let data = window.currentTab === "classic" ? demons : (window.currentTab === "players" ? players : submissions);
 
             data.forEach((item, index) => {
                 const li = document.createElement("li");
@@ -1050,97 +927,32 @@
                 listElement.appendChild(li);
             });
 
-            if (data.length > 0) {
-                selectLevel(selectedIndex);
-            } else {
-                document.getElementById("level-details").innerHTML = "<p style='color:#888;'>Keine Einträge vorhanden.</p>";
-            }
+            if (data.length > 0) selectLevel(selectedIndex);
+            else document.getElementById("level-details").innerHTML = "<p style='color:#888;'>Keine Einträge vorhanden.</p>";
         }
 
         function selectLevel(index) {
             selectedIndex = index;
-            const items = document.querySelectorAll(".level-item");
-            items.forEach((item, i) => {
-                item.classList.toggle("active", i === index);
-            });
+            document.querySelectorAll(".level-item").forEach((item, i) => item.classList.toggle("active", i === index));
 
-            const detailsContainer = document.getElementById("level-details");
-            if (!detailsContainer) return;
+            const container = document.getElementById("level-details");
+            if (!container) return;
 
-            if (window.currentTab === "profile") {
-                renderProfileView(detailsContainer);
-            } else if (window.currentTab === "submit") {
-                renderSubmitView(detailsContainer);
-            } else if (window.currentTab === "classic") {
-                renderDemonDetails(detailsContainer, index);
-            } else if (window.currentTab === "players") {
-                renderPlayerDetails(detailsContainer, index);
-            } else if (window.currentTab === "pending") {
-                renderPendingDetails(detailsContainer, index);
-            }
-        }
-
-        function renderProfileView(container) {
-            const username = currentUserData?.username || "Player";
-            const matchingPlayer = players.find(p => p.name.toLowerCase() === username.toLowerCase()) || {
-                placement: "-", points: 0, currentHardest: "-", beatenExtremes: []
-            };
-
-            let adminPanel = "";
-            if (isUserOwner()) {
-                adminPanel = `
-                    <div class="info-card" style="margin: 20px auto;">
-                        <h3 style="margin-bottom:10px; color:#ff6b00;">Owner Panel: Role Management</h3>
-                        <div style="display:flex; gap:10px; margin-bottom:10px;">
-                            <input type="text" id="manage-role-username" placeholder="Ingame Username" style="flex-grow:1; padding:8px; background:#121318; border:1px solid #2a2c3a; color:white; border-radius:4px;">
-                            <button class="btn-primary" style="width:auto; margin:0;" onclick="changeUserRole('admin')">Make Admin</button>
-                            <button class="btn-secondary" style="width:auto; margin:0;" onclick="changeUserRole('user')">Remove Admin</button>
-                        </div>
-                    </div>
-                `;
-            }
-
-            container.innerHTML = `
-                <div style="margin-bottom: 15px;">
-                    <button class="btn-secondary" style="width: auto; padding: 6px 12px; font-size: 13px;" onclick="switchTab('classic')">← Back to List</button>
-                </div>
-
-                <img src="${currentUserData?.avatarUrl || DEFAULT_AVATAR}" class="profile-avatar-large" alt="Avatar">
-                <h1 class="level-title" style="text-align: center;">${username}</h1>
-                <p class="description" style="text-align: center;">My Profile</p>
-
-                <div style="text-align: center; margin-bottom: 20px;">
-                    <button class="btn-primary" style="width: auto; padding: 6px 15px; font-size: 13px;" onclick="updateAvatarUrl()">Change Profile Picture</button>
-                </div>
-
-                <div class="info-card" style="margin: 0 auto;">
-                    <div class="info-row"><span class="info-label">Placement:</span><span class="info-value">#${matchingPlayer.placement}</span></div>
-                    <div class="info-row"><span class="info-label">Points:</span><span class="info-value">${matchingPlayer.points}</span></div>
-                    <div class="info-row"><span class="info-label">Current Hardest:</span><span class="info-value highlight-name">${matchingPlayer.currentHardest}</span></div>
-                    <div class="info-row"><span class="info-label">Beaten Extremes:</span><span class="info-value">${matchingPlayer.beatenExtremes.length > 0 ? matchingPlayer.beatenExtremes.join(", ") : "None"}</span></div>
-                </div>
-
-                ${adminPanel}
-
-                <div style="text-align: center; margin-top: 25px;">
-                    <button class="btn-secondary" style="width: auto; padding: 8px 20px; color: #ff4d4d; border-color: #ff4d4d;" onclick="handleLogout()">Log Out</button>
-                </div>
-            `;
+            if (window.currentTab === "submit") renderSubmitView(container);
+            else if (window.currentTab === "classic") renderDemonDetails(container, index);
+            else if (window.currentTab === "players") renderPlayerDetails(container, index);
+            else if (window.currentTab === "pending") renderPendingDetails(container, index);
         }
 
         function renderSubmitView(container) {
             if (!auth.currentUser) {
-                container.innerHTML = `
-                    <h1 class="level-title">Submit Level / Record</h1>
-                    <p class="description">Du musst angemeldet sein, um Level einzureichen.</p>
-                    <button class="btn-primary" style="width:auto;" onclick="openAuthModal()">Log In / Register</button>
-                `;
+                container.innerHTML = `<h1 class="level-title">Submit Level</h1><p class="description">Bitte melde dich an.</p>`;
                 return;
             }
 
             container.innerHTML = `
                 <h1 class="level-title">Submit Level / Record</h1>
-                <p class="description">Reiche ein neues Level ein oder melde deinen Record für ein existierendes Level an.</p>
+                <p class="description">Reiche ein neues Level ein.</p>
 
                 <div class="info-card">
                     <form onsubmit="handleLevelSubmission(event)">
@@ -1151,43 +963,27 @@
                         <div class="form-group">
                             <label>Difficulty Category</label>
                             <select id="sub-diff" required>
-                                <option value="Easy Demon">Easy Demon (1pt)</option>
-                                <option value="Medium Demon">Medium Demon (2pt)</option>
-                                <option value="Hard Demon">Hard Demon (3pt)</option>
-                                <option value="Insane Demon">Insane Demon (5pt)</option>
-                                <option value="Extreme Demon" selected>Extreme Demon (10pt)</option>
+                                <option value="Easy Demon">Easy Demon (1pt Basis)</option>
+                                <option value="Medium Demon">Medium Demon (2pt Basis)</option>
+                                <option value="Hard Demon">Hard Demon (3pt Basis)</option>
+                                <option value="Insane Demon">Insane Demon (5pt Basis)</option>
+                                <option value="Extreme Demon" selected>Extreme Demon (10pt Basis)</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Tier (1-10 Feinabstufung)</label>
-                            <select id="sub-tier" required>
-                                ${[1,2,3,4,5,6,7,8,9,10].map(t => `<option value="${t}">Tier ${t} (${TIER_MULTIPLIERS[t]}x)</option>`).join("")}
-                            </select>
+                            <label>Geschätzter Platz (Rang-Einschätzung)</label>
+                            <input type="number" id="sub-est-rank" min="1" required placeholder="z.B. 5 (Wo glaubst du passt das Level hin?)">
                         </div>
                         <div class="form-group">
-                            <label>Publisher</label>
-                            <input type="text" id="sub-publisher" required placeholder="Level Publisher">
+                            <label>Enjoyment Level (in %)</label>
+                            <input type="number" id="sub-enjoyment" min="0" max="100" required placeholder="z.B. 85">
                         </div>
-                        <div class="form-group">
-                            <label>Creator</label>
-                            <input type="text" id="sub-creator" required placeholder="Level Creator">
-                        </div>
-                        <div class="form-group">
-                            <label>Verifier (Ingame Name)</label>
-                            <input type="text" id="sub-verifier" required value="${currentUserData?.username || ''}">
-                        </div>
-                        <div class="form-group">
-                            <label>Original Verifier</label>
-                            <input type="text" id="sub-orig-verifier" required placeholder="Original Verifier">
-                        </div>
-                        <div class="form-group">
-                            <label>YouTube Link or ID</label>
-                            <input type="text" id="sub-yt" required placeholder="e.g. JCAOQQu4Iy0 or Link">
-                        </div>
-                        <div class="form-group">
-                            <label>Description</label>
-                            <textarea id="sub-desc" rows="3" placeholder="Beschreibung oder Stats..."></textarea>
-                        </div>
+                        <div class="form-group"><label>Publisher</label><input type="text" id="sub-publisher" required></div>
+                        <div class="form-group"><label>Creator</label><input type="text" id="sub-creator" required></div>
+                        <div class="form-group"><label>Verifier (Ingame Name)</label><input type="text" id="sub-verifier" required value="${currentUserData?.username || ''}"></div>
+                        <div class="form-group"><label>Original Verifier</label><input type="text" id="sub-orig-verifier" required></div>
+                        <div class="form-group"><label>YouTube Link or ID</label><input type="text" id="sub-yt" required></div>
+                        <div class="form-group"><label>Description</label><textarea id="sub-desc" rows="3"></textarea></div>
                         <button type="submit" class="btn-primary">Submit to Admins</button>
                     </form>
                 </div>
@@ -1210,76 +1006,18 @@
                 <p class="description">${demon.description || ''}</p>
                 
                 <div class="video-container">
-                    <iframe 
-                        src="https://www.youtube.com/embed/${cleanYtId}" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                        allowfullscreen>
-                    </iframe>
+                    <iframe src="https://www.youtube.com/embed/${cleanYtId}" allowfullscreen></iframe>
                 </div>
 
                 <div class="info-card">
-                    <div class="info-row">
-                        <span class="info-label">Difficulty / Tier:</span>
-                        <span class="info-value">${demon.difficulty} (Tier ${demon.tier || 1})</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Score Value:</span>
-                        <span class="info-value highlight-name">${calculatedPoints} Points</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Publisher:</span>
-                        <span class="info-value">${demon.publisher}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Creator:</span>
-                        <span class="info-value">${demon.creator}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Verifier:</span>
-                        <span class="info-value ${demon.myVerifier === 'Derlery5' ? 'highlight-name' : ''}">${demon.myVerifier}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Original Verifier:</span>
-                        <span class="info-value">${demon.originalVerifier}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Other Victors:</span>
-                        <span class="info-value">${(demon.victors && demon.victors.length > 0) ? demon.victors.join(", ") : "None"}</span>
-                    </div>
-                </div>
-            `;
-        }
-
-        function renderPlayerDetails(container, index) {
-            const player = players[index];
-            if (!player) return;
-
-            let editBtn = isUserAdmin() ? `<button class="btn-secondary" style="width:auto; font-size:12px; padding:4px 10px;" onclick="openEditPlayerModal(${index})">✏️ Bearbeiten</button>` : "";
-
-            container.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center; max-width:650px;">
-                    <h1 class="level-title">#${player.placement} - ${player.name}</h1>
-                    ${editBtn}
-                </div>
-                <p class="description">Player Profile</p>
-
-                <div class="info-card">
-                    <div class="info-row">
-                        <span class="info-label">Placement:</span>
-                        <span class="info-value">#${player.placement}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Points:</span>
-                        <span class="info-value">${player.points}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Current Hardest:</span>
-                        <span class="info-value highlight-name">${player.currentHardest}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Beaten Extremes:</span>
-                        <span class="info-value">${(player.beatenExtremes && player.beatenExtremes.length > 0) ? player.beatenExtremes.join(", ") : "None"}</span>
-                    </div>
+                    <div class="info-row"><span class="info-label">Difficulty / Tier:</span><span class="info-value">${demon.difficulty} (Tier ${demon.tier || 1})</span></div>
+                    <div class="info-row"><span class="info-label">Enjoyment Rating:</span><span class="info-value highlight-name">${demon.enjoyment || 'N/A'}</span></div>
+                    <div class="info-row"><span class="info-label">Score Value:</span><span class="info-value highlight-name">${calculatedPoints} Points</span></div>
+                    <div class="info-row"><span class="info-label">Publisher:</span><span class="info-value">${demon.publisher}</span></div>
+                    <div class="info-row"><span class="info-label">Creator:</span><span class="info-value">${demon.creator}</span></div>
+                    <div class="info-row"><span class="info-label">Verifier:</span><span class="info-value">${demon.myVerifier}</span></div>
+                    <div class="info-row"><span class="info-label">Original Verifier:</span><span class="info-value">${demon.originalVerifier}</span></div>
+                    <div class="info-row"><span class="info-label">Other Victors:</span><span class="info-value">${(demon.victors && demon.victors.length > 0) ? demon.victors.join(", ") : "None"}</span></div>
                 </div>
             `;
         }
@@ -1288,27 +1026,30 @@
             const sub = submissions[index];
             if (!sub) return;
 
-            const calcScore = calculateScore(sub.difficulty, sub.tier);
-
             container.innerHTML = `
                 <h1 class="level-title">Review Submission: ${sub.name}</h1>
                 <p class="description">Submitted by user: <strong>${sub.submittedBy}</strong></p>
 
                 <div class="info-card">
-                    <div class="info-row"><span class="info-label">Category & Tier:</span><span class="info-value">${sub.difficulty} (Tier ${sub.tier})</span></div>
-                    <div class="info-row"><span class="info-label">Calculated Score:</span><span class="info-value highlight-name">${calcScore} Points</span></div>
+                    <div class="info-row"><span class="info-label">Category:</span><span class="info-value">${sub.difficulty}</span></div>
+                    <div class="info-row"><span class="info-label">Eingeschätzter Rang:</span><span class="info-value">Platz #${sub.estimatedRank || 1}</span></div>
+                    <div class="info-row"><span class="info-label">Enjoyment Rating:</span><span class="info-value highlight-name">${sub.enjoyment || 'N/A'}</span></div>
                     <div class="info-row"><span class="info-label">Publisher:</span><span class="info-value">${sub.publisher}</span></div>
                     <div class="info-row"><span class="info-label">Creator:</span><span class="info-value">${sub.creator}</span></div>
                     <div class="info-row"><span class="info-label">Verifier:</span><span class="info-value">${sub.myVerifier}</span></div>
-                    <div class="info-row"><span class="info-label">Original Verifier:</span><span class="info-value">${sub.originalVerifier}</span></div>
-                    <div class="info-row"><span class="info-label">YouTube ID:</span><span class="info-value">${extractYouTubeId(sub.youtubeId)}</span></div>
                 </div>
 
                 <div class="info-card">
-                    <h3 style="margin-bottom:10px;">Approval Options</h3>
+                    <h3 style="margin-bottom:10px;">Approval Options (Admin/Owner)</h3>
                     <div class="form-group">
-                        <label>Placement / Rank (1 - ${demons.length + 1})</label>
-                        <input type="number" id="approve-rank" min="1" max="${demons.length + 1}" value="1">
+                        <label>Finale Platzierung / Rank (1 - ${demons.length + 1})</label>
+                        <input type="number" id="approve-rank" min="1" max="${demons.length + 1}" value="${sub.estimatedRank || 1}">
+                    </div>
+                    <div class="form-group">
+                        <label>Finales Tier (1-10 festlegen)</label>
+                        <select id="approve-tier">
+                            ${[1,2,3,4,5,6,7,8,9,10].map(t => `<option value="${t}">Tier ${t} (${TIER_MULTIPLIERS[t]}x Multiplikator)</option>`).join("")}
+                        </select>
                     </div>
                     <div style="display:flex; gap:10px;">
                         <button class="btn-success" style="flex-grow:1;" onclick="approveSubmission('${sub.id}')">Accept Level</button>
@@ -1318,7 +1059,22 @@
             `;
         }
 
-        // Startpunkt
+        function renderPlayerDetails(container, index) {
+            const player = players[index];
+            if (!player) return;
+
+            container.innerHTML = `
+                <h1 class="level-title">#${player.placement} - ${player.name}</h1>
+                <p class="description">Player Profile</p>
+                <div class="info-card">
+                    <div class="info-row"><span class="info-label">Placement:</span><span class="info-value">#${player.placement}</span></div>
+                    <div class="info-row"><span class="info-label">Points:</span><span class="info-value">${player.points}</span></div>
+                    <div class="info-row"><span class="info-label">Current Hardest:</span><span class="info-value highlight-name">${player.currentHardest}</span></div>
+                    <div class="info-row"><span class="info-label">Beaten Extremes:</span><span class="info-value">${(player.beatenExtremes && player.beatenExtremes.length > 0) ? player.beatenExtremes.join(", ") : "None"}</span></div>
+                </div>
+            `;
+        }
+
         initFirestoreListeners();
     </script>
 </body>
