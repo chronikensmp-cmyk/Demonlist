@@ -482,6 +482,14 @@
             onSnapshot
         } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+        // Helper Funktion zum Extrahieren der reinen YouTube Video-ID aus Links oder reinen IDs
+        function extractYouTubeId(urlOrId) {
+            if (!urlOrId) return "";
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = urlOrId.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : urlOrId.trim();
+        }
+
         // Fallback Initial Data
         const initialDemons = [
             { rank: 1, name: "Tung Tung Tung Sahurcles", difficulty: "Extreme Demon", tier: 10, publisher: "ArraegenGD", creator: "ArraegenGD", myVerifier: "Derlery5", originalVerifier: "Nova4664", victors: ["Player1", "Player2"], youtubeId: "JCAOQQu4Iy0", description: "Tripple T" },
@@ -653,6 +661,8 @@
 
         window.handleLevelSubmission = async function(e) {
             e.preventDefault();
+            const rawYtInput = document.getElementById("sub-yt").value;
+
             const newSub = {
                 name: document.getElementById("sub-name").value.trim(),
                 difficulty: document.getElementById("sub-diff").value,
@@ -661,7 +671,7 @@
                 creator: document.getElementById("sub-creator").value.trim(),
                 myVerifier: document.getElementById("sub-verifier").value.trim(),
                 originalVerifier: document.getElementById("sub-orig-verifier").value.trim(),
-                youtubeId: document.getElementById("sub-yt").value.trim(),
+                youtubeId: extractYouTubeId(rawYtInput),
                 description: document.getElementById("sub-desc").value.trim(),
                 submittedBy: currentUserData?.username || "Unknown",
                 createdAt: new Date().toISOString()
@@ -703,7 +713,7 @@
                     myVerifier: sub.myVerifier,
                     originalVerifier: sub.originalVerifier,
                     victors: [],
-                    youtubeId: sub.youtubeId,
+                    youtubeId: extractYouTubeId(sub.youtubeId),
                     description: sub.description
                 };
                 demons.push(newDemon);
@@ -780,7 +790,7 @@
                 <div class="form-group"><label>Verifier</label><input type="text" id="edit-d-verifier" value="${d.myVerifier}"></div>
                 <div class="form-group"><label>Original Verifier</label><input type="text" id="edit-d-orig" value="${d.originalVerifier}"></div>
                 <div class="form-group"><label>Other Victors (Kommagetrennt)</label><input type="text" id="edit-d-victors" value="${(d.victors||[]).join(", ")}"></div>
-                <div class="form-group"><label>YouTube ID</label><input type="text" id="edit-d-yt" value="${d.youtubeId}"></div>
+                <div class="form-group"><label>YouTube Link or ID</label><input type="text" id="edit-d-yt" value="${d.youtubeId}"></div>
                 <button class="btn-primary" onclick="saveDemonEdits(${index})">Save Changes</button>
                 <button class="btn-danger" style="width:100%; margin-bottom:10px;" onclick="deleteDemon(${index})">Delete Level</button>
             `;
@@ -800,7 +810,7 @@
             const victorsStr = document.getElementById("edit-d-victors").value;
             demons[index].victors = victorsStr.split(",").map(v => v.trim()).filter(v => v.length > 0);
             
-            demons[index].youtubeId = document.getElementById("edit-d-yt").value.trim();
+            demons[index].youtubeId = extractYouTubeId(document.getElementById("edit-d-yt").value);
 
             await saveDemonsToDb();
             window.closeEditModal();
@@ -1152,8 +1162,8 @@
                             <input type="text" id="sub-orig-verifier" required placeholder="Original Verifier">
                         </div>
                         <div class="form-group">
-                            <label>YouTube Video ID</label>
-                            <input type="text" id="sub-yt" required placeholder="e.g. JCAOQQu4Iy0">
+                            <label>YouTube Link or ID</label>
+                            <input type="text" id="sub-yt" required placeholder="e.g. JCAOQQu4Iy0 or Link">
                         </div>
                         <div class="form-group">
                             <label>Description</label>
@@ -1169,6 +1179,7 @@
             const demon = demons[index];
             if (!demon) return;
 
+            const cleanYtId = extractYouTubeId(demon.youtubeId);
             const calculatedPoints = calculateScore(demon.difficulty, demon.tier || 1);
             let editBtn = isUserAdmin() ? `<button class="btn-secondary" style="width:auto; font-size:12px; padding:4px 10px;" onclick="openEditDemonModal(${index})">✏️ Bearbeiten</button>` : "";
 
@@ -1180,7 +1191,7 @@
                 <p class="description">${demon.description || ''}</p>
                 
                 <div class="video-container">
-                    <iframe src="https://www.youtube-nocookie.com/embed/${demon.youtubeId}" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                    <iframe src="https://www.youtube-nocookie.com/embed/${cleanYtId}" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
                 </div>
 
                 <div class="info-card">
@@ -1267,7 +1278,7 @@
                     <div class="info-row"><span class="info-label">Creator:</span><span class="info-value">${sub.creator}</span></div>
                     <div class="info-row"><span class="info-label">Verifier:</span><span class="info-value">${sub.myVerifier}</span></div>
                     <div class="info-row"><span class="info-label">Original Verifier:</span><span class="info-value">${sub.originalVerifier}</span></div>
-                    <div class="info-row"><span class="info-label">YouTube ID:</span><span class="info-value">${sub.youtubeId}</span></div>
+                    <div class="info-row"><span class="info-label">YouTube ID:</span><span class="info-value">${extractYouTubeId(sub.youtubeId)}</span></div>
                 </div>
 
                 <div class="info-card">
