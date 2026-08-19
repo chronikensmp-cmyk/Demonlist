@@ -134,6 +134,7 @@
             display: flex;
             justify-content: flex-end;
             align-items: center;
+            gap: 10px;
         }
 
         .account-btn {
@@ -262,8 +263,10 @@
             border-radius: 8px;
             padding: 25px;
             width: 90%;
-            max-width: 400px;
+            max-width: 450px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         .modal-title {
@@ -283,7 +286,7 @@
             margin-bottom: 4px;
         }
 
-        .form-group input {
+        .form-group input, .form-group select {
             width: 100%;
             padding: 10px;
             background-color: #121318;
@@ -340,6 +343,20 @@
             border: 2px solid #ff6b00;
             background-color: #2a2c3a;
         }
+
+        .submission-card {
+            background-color: #121318;
+            border: 1px solid #2a2c3a;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+
+        .submission-card h4 {
+            color: #ff6b00;
+            margin-bottom: 6px;
+        }
     </style>
 </head>
 <body>
@@ -355,12 +372,16 @@
                 <button class="tab" id="tab-players" onclick="switchTab('players')">PLAYERS</button>
             </div>
             <input type="text" id="search" placeholder="Search..." onkeyup="filterLevels()">
+            <button class="btn-primary" style="margin-bottom: 10px;" onclick="openSubmitModal()">+ Submit Level</button>
             <ul id="level-list" class="level-list"></ul>
         </aside>
 
         <!-- Main Wrapper -->
         <div class="main-wrapper">
             <header class="top-header">
+                <button id="admin-pending-btn" class="account-btn" style="display: none; border-color: #ff6b00;" onclick="openAdminModal()">
+                    Admin Pending (<span id="pending-count">0</span>)
+                </button>
                 <button class="account-btn" onclick="handleAccountClick()">
                     <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23888888'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/></svg>" id="header-avatar" class="avatar-img" alt="Avatar">
                     <span id="header-username">Log In / Register</span>
@@ -373,7 +394,7 @@
         </div>
     </div>
 
-    <!-- Modal -->
+    <!-- Modal Log In / Register -->
     <div class="modal" id="auth-modal">
         <div class="modal-content">
             <h2 class="modal-title" id="auth-title">Log In</h2>
@@ -382,7 +403,7 @@
             <form id="auth-form" onsubmit="handleAuthSubmit(event)">
                 <div class="form-group" id="username-group" style="display: none;">
                     <label for="auth-username">Ingame Username</label>
-                    <input type="text" id="auth-username" placeholder="e.g. Derlery5">
+                    <input type="text" id="auth-username" placeholder="e.g. qChrc">
                 </div>
                 <div class="form-group">
                     <label for="auth-email">Email</label>
@@ -404,6 +425,64 @@
         </div>
     </div>
 
+    <!-- Modal Einreich-System (Submit Level) -->
+    <div class="modal" id="submit-modal">
+        <div class="modal-content">
+            <h2 class="modal-title">Submit Level / Record</h2>
+            <div class="error-message" id="submit-error"></div>
+            <form id="submit-form" onsubmit="handleFormSubmission(event)">
+                <div class="form-group">
+                    <label for="sub-player">Ingame Username</label>
+                    <input type="text" id="sub-player" required placeholder="e.g. qChrc">
+                </div>
+                <div class="form-group">
+                    <label for="sub-name">Level Name</label>
+                    <input type="text" id="sub-name" required placeholder="e.g. Bloodbath">
+                </div>
+                <div class="form-group">
+                    <label for="sub-difficulty">Difficulty</label>
+                    <select id="sub-difficulty">
+                        <option value="Easy Demon">Easy Demon</option>
+                        <option value="Medium Demon">Medium Demon</option>
+                        <option value="Hard Demon">Hard Demon</option>
+                        <option value="Insane Demon">Insane Demon</option>
+                        <option value="Extreme Demon">Extreme Demon</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="sub-publisher">Publisher</label>
+                    <input type="text" id="sub-publisher" required placeholder="e.g. Riot">
+                </div>
+                <div class="form-group">
+                    <label for="sub-creator">Creator</label>
+                    <input type="text" id="sub-creator" required placeholder="e.g. Riot & More">
+                </div>
+                <div class="form-group">
+                    <label for="sub-youtube">YouTube Video ID (e.g. JCAOQQu4Iy0)</label>
+                    <input type="text" id="sub-youtube" required placeholder="JCAOQQu4Iy0">
+                </div>
+                <div class="form-group">
+                    <label for="sub-description">Description / Notes</label>
+                    <input type="text" id="sub-description" placeholder="Optional info">
+                </div>
+
+                <button type="submit" class="btn-primary">Submit</button>
+                <button type="button" class="btn-secondary" onclick="closeSubmitModal()">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Admin Pending Submissions -->
+    <div class="modal" id="admin-modal">
+        <div class="modal-content">
+            <h2 class="modal-title">Pending Submissions</h2>
+            <div id="admin-submissions-list">
+                <p style="color: #888;">No pending submissions.</p>
+            </div>
+            <button type="button" class="btn-secondary" onclick="closeAdminModal()" style="margin-top: 15px;">Close</button>
+        </div>
+    </div>
+
     <!-- Firebase Script -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -422,7 +501,11 @@
             doc, 
             setDoc, 
             getDoc,
-            updateDoc
+            updateDoc,
+            collection,
+            addDoc,
+            getDocs,
+            deleteDoc
         } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -443,6 +526,35 @@
 
         let currentUserData = null;
         let isRegisterMode = false;
+        let pendingSubmissions = [];
+
+        /* Base Values & Tier Multipliers */
+        const baseValues = {
+            "Easy Demon": 1,
+            "Medium Demon": 2,
+            "Hard Demon": 3,
+            "Insane Demon": 5,
+            "Extreme Demon": 10
+        };
+
+        const tierMultipliers = {
+            1: 1.0,
+            2: 1.2,
+            3: 1.4,
+            4: 1.6,
+            5: 1.8,
+            6: 2.0,
+            7: 2.3,
+            8: 2.6,
+            9: 3.0,
+            10: 3.5
+        };
+
+        function calculatePoints(difficulty, tier) {
+            const base = baseValues[difficulty] || 1;
+            const mult = tierMultipliers[tier] || 1.0;
+            return Math.round((base * mult) * 10) / 10;
+        }
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
@@ -456,9 +568,11 @@
                     };
                 }
                 updateHeaderUI(true);
+                checkAdminStatus();
             } else {
                 currentUserData = null;
                 updateHeaderUI(false);
+                document.getElementById("admin-pending-btn").style.display = "none";
             }
         });
 
@@ -474,6 +588,203 @@
                 name.textContent = "Log In / Register";
             }
         }
+
+        async function checkAdminStatus() {
+            if (currentUserData && currentUserData.username && currentUserData.username.toLowerCase() === "qchrc") {
+                document.getElementById("admin-pending-btn").style.display = "flex";
+                loadPendingSubmissions();
+            } else {
+                document.getElementById("admin-pending-btn").style.display = "none";
+            }
+        }
+
+        async function loadPendingSubmissions() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "submissions"));
+                pendingSubmissions = [];
+                querySnapshot.forEach((docSnap) => {
+                    pendingSubmissions.push({ id: docSnap.id, ...docSnap.data() });
+                });
+                document.getElementById("pending-count").textContent = pendingSubmissions.length;
+            } catch (e) {
+                console.error("Error loading submissions: ", e);
+            }
+        }
+
+        /* Modal Submissions Functions */
+        window.openSubmitModal = function() {
+            if (!auth.currentUser) {
+                openAuthModal();
+                return;
+            }
+            if (currentUserData && currentUserData.username) {
+                document.getElementById("sub-player").value = currentUserData.username;
+            }
+            document.getElementById("submit-modal").classList.add("active");
+            document.getElementById("submit-error").style.display = "none";
+        };
+
+        window.closeSubmitModal = function() {
+            document.getElementById("submit-modal").classList.remove("active");
+        };
+
+        window.handleFormSubmission = async function(e) {
+            e.preventDefault();
+            const player = document.getElementById("sub-player").value.trim();
+            const name = document.getElementById("sub-name").value.trim();
+            const difficulty = document.getElementById("sub-difficulty").value;
+            const publisher = document.getElementById("sub-publisher").value.trim();
+            const creator = document.getElementById("sub-creator").value.trim();
+            const youtubeId = document.getElementById("sub-youtube").value.trim();
+            const description = document.getElementById("sub-description").value.trim();
+
+            try {
+                await addDoc(collection(db, "submissions"), {
+                    player,
+                    name,
+                    difficulty,
+                    publisher,
+                    creator,
+                    youtubeId,
+                    description,
+                    submittedAt: new Date().toISOString()
+                });
+                alert("Submission successful! Waiting for approval.");
+                closeSubmitModal();
+                if (currentUserData && currentUserData.username && currentUserData.username.toLowerCase() === "qchrc") {
+                    loadPendingSubmissions();
+                }
+            } catch (err) {
+                const errEl = document.getElementById("submit-error");
+                errEl.textContent = err.message;
+                errEl.style.display = "block";
+            }
+        };
+
+        /* Admin Approval System */
+        window.openAdminModal = async function() {
+            await loadPendingSubmissions();
+            const container = document.getElementById("admin-submissions-list");
+            container.innerHTML = "";
+
+            if (pendingSubmissions.length === 0) {
+                container.innerHTML = `<p style="color: #888;">No pending submissions.</p>`;
+            } else {
+                pendingSubmissions.forEach((sub, idx) => {
+                    const card = document.createElement("div");
+                    card.className = "submission-card";
+                    card.innerHTML = `
+                        <h4>${sub.name} (${sub.difficulty})</h4>
+                        <p><strong>Player:</strong> ${sub.player}</p>
+                        <p><strong>Publisher/Creator:</strong> ${sub.publisher} / ${sub.creator}</p>
+                        <p><strong>YouTube ID:</strong> ${sub.youtubeId}</p>
+                        <div style="margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                            <label style="font-size: 11px;">Tier (1-10):</label>
+                            <input type="number" id="tier-input-${idx}" min="1" max="10" value="5" style="width: 50px; padding: 4px; background: #1a1b23; border: 1px solid #2a2c3a; color: white;">
+                            <button class="btn-primary" style="width: auto; padding: 4px 10px; margin:0;" onclick="approveSubmission('${sub.id}', ${idx})">Approve</button>
+                            <button class="btn-secondary" style="width: auto; padding: 4px 10px; margin:0; color: #ff4d4d; border-color: #ff4d4d;" onclick="rejectSubmission('${sub.id}')">Reject</button>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            }
+
+            document.getElementById("admin-modal").classList.add("active");
+        };
+
+        window.closeAdminModal = function() {
+            document.getElementById("admin-modal").classList.remove("active");
+        };
+
+        window.rejectSubmission = async function(docId) {
+            try {
+                await deleteDoc(doc(db, "submissions", docId));
+                openAdminModal();
+            } catch (e) {
+                alert("Error deleting submission: " + e.message);
+            }
+        };
+
+        window.approveSubmission = async function(docId, idx) {
+            const sub = pendingSubmissions.find(s => s.id === docId);
+            if (!sub) return;
+
+            const tierInput = document.getElementById(`tier-input-${idx}`).value;
+            const tier = parseInt(tierInput) || 5;
+
+            let rank = demons.length + 1;
+            let diffIcon = "easy.webp";
+            if (sub.difficulty === "Medium Demon") diffIcon = "medium.webp";
+            if (sub.difficulty === "Insane Demon") diffIcon = "insane.png";
+            if (sub.difficulty === "Extreme Demon") diffIcon = "extreme.jpg";
+
+            // AREDL Auto-Rating check if Extreme Demon
+            if (sub.difficulty === "Extreme Demon") {
+                try {
+                    const res = await fetch("https://api.aredl.net/v2/demons");
+                    if (res.ok) {
+                        const aredlDemons = await res.json();
+                        const matched = aredlDemons.find(d => d.name.toLowerCase() === sub.name.toLowerCase());
+                        if (matched && matched.position) {
+                            rank = matched.position;
+                        }
+                    }
+                } catch (err) {
+                    console.log("AREDL API not reachable or level not found, placing at end.", err);
+                }
+            }
+
+            const calculatedPoints = calculatePoints(sub.difficulty, tier);
+
+            const newDemon = {
+                rank: rank,
+                name: sub.name,
+                difficulty: sub.difficulty,
+                difficultyIcon: diffIcon,
+                publisher: sub.publisher,
+                creator: sub.creator,
+                myVerifier: sub.player,
+                originalVerifier: sub.publisher,
+                victors: [sub.player],
+                youtubeId: sub.youtubeId,
+                description: sub.description || "Community Submission",
+                tier: tier
+            };
+
+            demons.splice(rank - 1, 0, newDemon);
+            // Re-rank remaining
+            demons.forEach((d, i) => d.rank = i + 1);
+
+            // Update or Add Player
+            let playerObj = players.find(p => p.name.toLowerCase() === sub.player.toLowerCase());
+            if (!playerObj) {
+                playerObj = {
+                    placement: players.length + 1,
+                    name: sub.player,
+                    currentHardest: sub.name,
+                    points: calculatedPoints,
+                    beatenExtremes: sub.difficulty === "Extreme Demon" ? [sub.name] : []
+                };
+                players.push(playerObj);
+            } else {
+                playerObj.points += calculatedPoints;
+                if (sub.difficulty === "Extreme Demon" && !playerObj.beatenExtremes.includes(sub.name)) {
+                    playerObj.beatenExtremes.push(sub.name);
+                }
+                playerObj.currentHardest = sub.name;
+            }
+
+            // Re-sort players by points
+            players.sort((a, b) => b.points - a.points);
+            players.forEach((p, i) => p.placement = i + 1);
+
+            // Cleanup submission from Firestore
+            await deleteDoc(doc(db, "submissions", docId));
+
+            alert(`Level "${sub.name}" approved! Earned ${calculatedPoints} points (Tier ${tier}).`);
+            loadLevelList();
+            openAdminModal();
+        };
 
         window.handleAccountClick = function() {
             if (auth.currentUser) {
@@ -902,7 +1213,7 @@
                         </div>
                         <div class="info-row">
                             <span class="info-label">Verifier:</span>
-                            <span class="info-value ${demon.myVerifier === 'Derlery5' ? 'highlight-name' : ''}">${demon.myVerifier}</span>
+                            <span class="info-value ${demon.myVerifier === 'qChrc' ? 'highlight-name' : ''}">${demon.myVerifier}</span>
                         </div>
                         <div class="info-row">
                             <span class="info-label">Original Verifier:</span>
